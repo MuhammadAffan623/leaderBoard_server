@@ -1,5 +1,6 @@
-import { Response, Request } from 'express';
-import logger from './logger';
+import { Response, Request } from "express";
+import logger from "./logger";
+import { CustomRequest } from "../types";
 
 type SuccessResponseType = {
   data?: object | string;
@@ -17,7 +18,7 @@ type SuccessParamType = {
 };
 
 type ErrorParamType = {
-  req: Request;
+  req: Request | CustomRequest;
   res: Response;
   error: any;
   statusCode?: number;
@@ -27,7 +28,7 @@ export const sendSuccessResponse = ({
   res,
   data,
   token,
-  message = 'Success',
+  message = "Success",
   statusCode = 200,
 }: SuccessParamType) => {
   const responseObj: SuccessResponseType = { message, status: true };
@@ -44,7 +45,7 @@ export const sendErrorResponse = ({
 }: ErrorParamType) => {
   const status: number = statusCode || 500;
   const _error: string =
-    error?.message || error?.errors || error || 'invalid token';
+    error?.message || error?.errors || error || "invalid token";
   logger.error(
     `[${req?.method}] ${req?.path} >> StatusCode:: ${status}, Message:: ${_error}`
   );

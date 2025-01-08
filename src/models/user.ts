@@ -1,5 +1,9 @@
 import { Schema, model, Document } from "mongoose";
 
+export enum USERROLE {
+  ADMIN = "ADMIN",
+  USER = "USER",
+}
 export interface IUser extends Document {
   twitterId: string;
   walletAddress: string;
@@ -8,6 +12,7 @@ export interface IUser extends Document {
   programJoinedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  role: USERROLE;
 }
 
 const userSchema = new Schema<IUser>(
@@ -17,6 +22,11 @@ const userSchema = new Schema<IUser>(
     telegramId: { type: String },
     isProgramMember: { type: Boolean, default: false },
     programJoinedAt: { type: Date },
+    role: {
+      type: String,
+      default: USERROLE.USER,
+      enum: Object.values(USERROLE),
+    },
   },
   { timestamps: true } // Automatically adds createdAt and updatedAt fields
 );

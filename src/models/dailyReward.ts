@@ -24,12 +24,12 @@ const dailyRewardSchema = new Schema<IDailyReward>(
   },
   { timestamps: true }
 );
-
+// using this for leader board, cause it would have adjustments
 export const DailyReward = model<IDailyReward>(
   "DailyReward",
   dailyRewardSchema
 );
-// dupliacting for cron cause it wont be updated by admin
+// dupliacting for cron cause it wont be updated by admin, no adjustments
 export const CronDailyReward = model<IDailyReward>(
   "CronDailyReward",
   dailyRewardSchema

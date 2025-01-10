@@ -9,7 +9,7 @@ export interface IUser extends Document {
   walletAddress: string;
   telegramId?: string;
   isProgramMember: boolean;
-  programJoinedAt?: Date;
+  fetchDateTime: Date;
   createdAt?: Date;
   updatedAt?: Date;
   role: USERROLE;
@@ -21,14 +21,19 @@ const userSchema = new Schema<IUser>(
     walletAddress: { type: String, required: true, unique: true },
     telegramId: { type: String },
     isProgramMember: { type: Boolean, default: false },
-    programJoinedAt: { type: Date },
+    fetchDateTime: {
+      type: Date,
+      required: true,
+      default: new Date("1995-01-01"),
+    },
+
     role: {
       type: String,
       default: USERROLE.USER,
       enum: Object.values(USERROLE),
     },
   },
-  { timestamps: true } // Automatically adds createdAt and updatedAt fields
+  { timestamps: true }
 );
 
 export const User = model<IUser>("User", userSchema);

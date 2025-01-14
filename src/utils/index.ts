@@ -69,3 +69,44 @@ export const authorizeRoles = (role: USERROLE) => {
     }
   };
 };
+
+export const matchKeywordInString = async (
+  text: string,
+  keyword: string
+): Promise<string[]> => {
+  const pattern = new RegExp(
+    `(\\$${keyword}|\\s${keyword}(?![a-zA-Z])|#${keyword}|${keyword}\\b)`,
+    "g"
+  );
+  const matches = text.matchAll(pattern);
+  return Array.from(matches, (match) => match[0]);
+};
+
+export const isKeywordinPost = (text: string): boolean => {
+  const keywords = ["@tardionmoon", "$TARDI", "tardi", "TARDI"];
+  return keywords.some((keyword) => text.includes(keyword));
+};
+
+// merging 2 arrays without making duplicates
+export async function mergeArrays<T>(array1: T[], array2: T[]): Promise<T[]> {
+  const mergedSet = new Set([...array1, ...array2]);
+  return Array.from(mergedSet);
+}
+export async function getDifference(number1: number, number2: number) {
+  return Math.abs(number1 - number2);
+}
+// async function countKeywords(
+//   arrayOfTweet: { text?: string }[],
+//   keyword: string
+// ): Promise<number> {
+//   let count = 0;
+//   await Promise.all(
+//     arrayOfTweet.map(async (tweet) => {
+//       if (tweet?.text) {
+//         const occurred = await matchKeywordInString(tweet.text, keyword);
+//         count += occurred.length || 0;
+//       }
+//     })
+//   );
+//   return count;
+// }

@@ -6,6 +6,7 @@ export interface IRewardPrice extends Document {
   retweetsReward: number;
   spacesAttendedReward: number;
   telegramReward: number;
+  commentReward: number;
   // price: number;
   createdAt?: Date;
   updatedAt?: Date;
@@ -18,6 +19,7 @@ const rewardPriceSchema = new Schema<IRewardPrice>(
     retweetsReward: { type: Number, default: 0 },
     spacesAttendedReward: { type: Number, default: 0 },
     telegramReward: { type: Number, default: 0 },
+    commentReward: { type: Number, default: 0 },
     // price: { type: Number, default: 0 },
   },
   { timestamps: true }

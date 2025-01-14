@@ -1,5 +1,26 @@
-// import { Leaderboard } from "src/models/leaderBoard";
+import { CreateLeaderboardObject } from "../types";
+import { Leaderboard } from "../models/leaderBoard";
+import { ClientSession } from "mongoose";
 
+const leaderBoardService = () => {
+  const createMultipleLeaderBoards = async (
+    leaderboardData: CreateLeaderboardObject[],
+    session?: ClientSession
+  ) => {
+    const result = await Leaderboard.insertMany(leaderboardData, {
+      session,
+      ordered: true, // Ensures the operation stops at the first error
+    });
+
+    return result;
+  };
+
+  return {
+    createMultipleLeaderBoards,
+  };
+};
+
+export default leaderBoardService;
 // // Create a new leaderboard entry
 // const newEntry = await Leaderboard.create({
 //   userId: someUserId,

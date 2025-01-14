@@ -26,10 +26,7 @@ const userActivityService = () => {
         Object.keys(activityData).forEach((key) => {
           const dataKey = key as keyof UserActivityData;
           if (Array.isArray(activityData[dataKey])) {
-            existingActivity[dataKey] = [
-              ...(existingActivity[dataKey] as string[]),
-              ...activityData[dataKey],
-            ];
+            existingActivity[dataKey] = [...activityData[dataKey]];
           }
         });
 

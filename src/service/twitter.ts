@@ -15,6 +15,7 @@ const twitterService = () => {
 
       return tweet.data;
     } catch (error: any) {
+      console.log(error);
       console.error("Error fetching tweet details:", error.message);
       throw new Error(`Failed to fetch tweet details: ${error.message}`);
     }
@@ -25,14 +26,17 @@ const twitterService = () => {
     date: string
   ): Promise<TweetV2[]> => {
     try {
+      console.log("userId", userId);
       const startTime = moment(date).toISOString();
+      console.log("startTime", startTime);
       const tweetsResponse = await twitterClient.v2.userTimeline(userId, {
         "tweet.fields":
           "in_reply_to_user_id,referenced_tweets,created_at,text,public_metrics",
         start_time: startTime,
       });
-      return tweetsResponse?.data?.data;
+      return tweetsResponse?.data?.data || [];
     } catch (error: any) {
+      console.log(error);
       console.error("Error fetching user tweets:", error.message);
       throw new Error(`Failed to fetch user tweets: ${error.message}`);
     }

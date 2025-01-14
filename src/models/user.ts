@@ -24,7 +24,7 @@ const userSchema = new Schema<IUser>(
     fetchDateTime: {
       type: Date,
       required: true,
-      default: new Date("1995-01-01"),
+      default: new Date("2025-01-01"), //update it according to project start time
     },
 
     role: {

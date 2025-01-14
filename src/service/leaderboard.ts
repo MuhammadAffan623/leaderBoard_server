@@ -1,0 +1,40 @@
+// import { Leaderboard } from "src/models/leaderBoard";
+
+// // Create a new leaderboard entry
+// const newEntry = await Leaderboard.create({
+//   userId: someUserId,
+//   leaderboardType: LeaderboardTypes.Program_Members,
+//   rank: 1,
+//   score: 1000,
+//   metrics: {
+//     impressions: 500,
+//     tweets: 50,
+//     retweets: 25,
+//     telegramMessages: 100,
+//   },
+//   date: new Date(), // Today's date
+// });
+
+// // Get top 10 users for today
+// const topUsers = await Leaderboard.find({
+//   leaderboardType: LeaderboardTypes.Program_Members,
+//   date: new Date(),
+// })
+//   .sort({ score: -1 })
+//   .limit(10)
+//   .populate("userId");
+
+// // Get user's rank for a specific date
+// const userRank = await Leaderboard.findOne({
+//   userId: userId,
+//   leaderboardType: LeaderboardTypes.Program_Members,
+//   date: specificDate,
+// });
+
+// // Get user's history
+// const userHistory = await Leaderboard.find({
+//   userId: userId,
+//   leaderboardType: LeaderboardTypes.Program_Members,
+// })
+//   .sort({ date: -1 })
+//   .limit(7); // Last 7 days

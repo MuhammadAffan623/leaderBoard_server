@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { IUser } from "../models/user";
 import { TweetV2 } from "twitter-api-v2/dist/esm";
+import { LeaderboardTypes } from "../models/leaderBoard";
 
 export interface CustomRequest extends Request {
   userId?: string;
@@ -24,7 +25,6 @@ export type GetUserNewDataReturn = {
 
 export type UserActivityData = {
   tweetIds: string[];
-  retweetIds: string[];
   commentIds: string[];
   spaceAttendedIds: string[];
 };
@@ -36,7 +36,7 @@ export interface TotalCounts {
   totalSpacesAttendedCount: number;
   totalTelegramMessagesCount: number;
   totalCalculatedReward: number;
-  totalCommentCounts: number
+  totalCommentCounts: number;
 }
 
 export interface ICreateCron {
@@ -48,4 +48,21 @@ export interface ICreateCron {
   telegramMessagesCount: number;
   calculatedReward: number;
   commentCounts: number;
+}
+
+interface LeaderboardMetrics {
+  impressionsCount: number;
+  tweetsCount: number;
+  retweetsCount: number;
+  telegramMessagesCount: number;
+  spaceAttendedCount: number;
+  commentCount: number;
+}
+export interface CreateLeaderboardObject {
+  userId: string;
+  leaderboardType: LeaderboardTypes;
+  rank: number;
+  score: number;
+  metrics: LeaderboardMetrics;
+  date: Date;
 }

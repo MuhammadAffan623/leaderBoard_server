@@ -3,7 +3,6 @@ import { Types, ClientSession } from "mongoose";
 
 type UserActivityData = {
   tweetIds: string[];
-  retweetIds: string[];
   commentIds: string[];
   // spaceAttendedIds: string[];
   // telegram chat ids too
@@ -11,7 +10,7 @@ type UserActivityData = {
 
 const userActivityService = () => {
   const createOrUpdateUserActivity = async (
-    userId: Types.ObjectId,
+    userId: string,
     activityData: UserActivityData,
     session?: ClientSession // Optional session for transactions
   ): Promise<IUserActivity> => {

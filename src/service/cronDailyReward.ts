@@ -1,5 +1,6 @@
 import { ICreateCron, TotalCounts } from "../types";
 import { CronDailyReward } from "../models/dailyReward";
+import { ClientSession } from "mongoose";
 
 const cronDailyRewardService = () => {
   const getAllCronReward = async (userId: string): Promise<TotalCounts> => {
@@ -38,30 +39,37 @@ const cronDailyRewardService = () => {
     }
   };
 
-  // Create new CronDailyReward entry
-  const createCronDailyReward = async (data: ICreateCron) => {
+  const createCronDailyReward = async (
+    data: ICreateCron,
+    session?: ClientSession
+  ) => {
     try {
       // Validate userId
       if (!data.userId) {
         throw new Error("userId is required");
       }
 
-      // Create the new CronDailyReward document
-      const newCronReward = await CronDailyReward.create({
-        userId: data.userId,
-        impressionsCount: data.impressionsCount || 0,
-        tweetCounts: data.tweetCounts || 0,
-        retweetCounts: data.retweetCounts || 0,
-        commentCounts: data.commentCounts || 0,
-        spacesAttendedCount: data.spacesAttendedCount || 0,
-        telegramMessagesCount: data.telegramMessagesCount || 0,
-        calculatedReward: data.calculatedReward || 0,
-      });
+      // Create the new CronDailyReward document with or without a session
+      const newCronReward = await CronDailyReward.create(
+        [
+          {
+            userId: data.userId,
+            impressionsCount: data.impressionsCount || 0,
+            tweetCounts: data.tweetCounts || 0,
+            retweetCounts: data.retweetCounts || 0,
+            commentCounts: data.commentCounts || 0,
+            spacesAttendedCount: data.spacesAttendedCount || 0,
+            telegramMessagesCount: data.telegramMessagesCount || 0,
+            calculatedReward: data.calculatedReward || 0,
+          },
+        ],
+        { session }
+      );
 
       // Remember: Due to the pre-save middleware we added earlier,
       // this will automatically create a corresponding DailyReward document
 
-      return newCronReward;
+      return newCronReward[0]; // Since create with array returns an array
     } catch (error) {
       if (error instanceof Error) {
         throw new Error(`Failed to create CronDailyReward: ${error.message}`);

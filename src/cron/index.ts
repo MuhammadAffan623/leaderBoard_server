@@ -1,5 +1,6 @@
 import cron from "node-cron";
-import twitterCron from "./twitterCron2";
+import { twitterCron } from "./twitterCron2";
+import { createDailyLeaderboard } from "./leaderboard";
 // import { twitterCron } from "./twitterCron";
 
 const cronSchedule = "*/1 * * * * *"; // Runs every second
@@ -12,6 +13,7 @@ const cronJob = async (): Promise<void> => {
   const result = await twitterCron();
   if (result.success) {
     // run leader board cron
+    await createDailyLeaderboard();
   }
 };
 const job = cron.schedule(cronSchedule, cronJob);

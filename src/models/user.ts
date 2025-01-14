@@ -8,6 +8,7 @@ export interface IUser extends Document {
   twitterId: string;
   walletAddress: string;
   telegramId?: string;
+  twitterUsername?: string;
   isProgramMember: boolean;
   fetchDateTime: Date;
   createdAt?: Date;
@@ -20,6 +21,8 @@ const userSchema = new Schema<IUser>(
     twitterId: { type: String, required: true, unique: true },
     walletAddress: { type: String, required: true, unique: true },
     telegramId: { type: String },
+    twitterUsername: { type: String },
+
     isProgramMember: { type: Boolean, default: false },
     fetchDateTime: {
       type: Date,

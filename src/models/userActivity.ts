@@ -4,6 +4,7 @@ export interface IUserActivity extends Document {
   userId: Types.ObjectId;
   tweetIds: string[];
   retweetIds: string[];
+  commentIds: string[];
   spaceAttendedIds: string[];
   createdAt?: Date;
   updatedAt?: Date;
@@ -15,6 +16,7 @@ const userActivitySchema = new Schema<IUserActivity>(
     tweetIds: [{ type: String }],
     retweetIds: [{ type: String }],
     spaceAttendedIds: [{ type: String }],
+    commentIds: [{ type: String }],
   },
   {
     timestamps: true,

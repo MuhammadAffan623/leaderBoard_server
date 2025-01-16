@@ -1,0 +1,555 @@
+{
+	"info": {
+		"_postman_id": "0003cb6a-a03e-4a21-97f5-57485e2973e6",
+		"name": "Leader board",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32178895",
+		"_collection_link": "https://vapi-team.postman.co/workspace/af~e4f62984-90be-4e6d-8713-97aedde54e7c/collection/32178895-0003cb6a-a03e-4a21-97f5-57485e2973e6?action=share&source=collection_link&creator=32178895"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "create user with wallet address",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"walletAddress\":\"0x778945116X11\",\r\n    \"twitterId\":\"02\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all users",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"walletAddress\":\"xd\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/users/all?page=1&limit=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"all"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update loggen in user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODI5ODkwNGIxMTkwNmJmMTAzOTgwZiIsImlhdCI6MTczNzA1MzE2M30.8GPT4y1fVEVd_DDvrkK5uR0AkLemGfzCmDLsxBpGQus",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"twitterUsername\":\"shahmeer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/users/me",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user from token",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODk4NjFhMDQzNzBhZmYwZDQ1YWMwNSIsImlhdCI6MTczNzA2NjI1M30.AwUoP7OezyDX5tjjNIEMjKnZlXpeNJePLr-hKqzEWfQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"twitterUsername\":\"shahmeer\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "reward",
+			"item": [
+				{
+					"name": "create reward",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODkyOTc0YjJhOWFjOWI3YjhkYzYwYyIsImlhdCI6MTczNzA0MjI5OX0.2twPl45u4w-AfeZqqe5KTmy1Tly6pJK70sa9IntPn78",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"impressionReward\": 1,\r\n    \"tweetsReward\": 2,\r\n    \"retweetsReward\": 3,\r\n    \"spacesAttendedReward\": 4,\r\n    \"telegramReward\": 5,\r\n    \"commentReward\": 604\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/rewards",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rewards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all rewards",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODkyOTc0YjJhOWFjOWI3YjhkYzYwYyIsImlhdCI6MTczNzA0MjI5OX0.2twPl45u4w-AfeZqqe5KTmy1Tly6pJK70sa9IntPn78",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"impressionReward\": 1,\r\n    \"tweetsReward\": 2,\r\n    \"retweetsReward\": 3,\r\n    \"spacesAttendedReward\": 4,\r\n    \"telegramReward\": 5,\r\n    \"commentReward\": 604\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/rewards",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rewards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update reward",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODkyOTc0YjJhOWFjOWI3YjhkYzYwYyIsImlhdCI6MTczNzA0MjI5OX0.2twPl45u4w-AfeZqqe5KTmy1Tly6pJK70sa9IntPn78",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"impressionReward\": 1,\r\n    \"tweetsReward\": 2,\r\n    \"retweetsReward\": 3,\r\n    \"spacesAttendedReward\": 4,\r\n    \"telegramReward\": 5,\r\n    \"commentReward\": 606\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/rewards/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rewards",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6789565f2060dff54cef491a"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update reward Copy",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODkyOTc0YjJhOWFjOWI3YjhkYzYwYyIsImlhdCI6MTczNzA0MjI5OX0.2twPl45u4w-AfeZqqe5KTmy1Tly6pJK70sa9IntPn78",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/v1/rewards/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rewards",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "67895743241ab6d79f99711e"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "white list all users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODkyOTc0YjJhOWFjOWI3YjhkYzYwYyIsImlhdCI6MTczNzA0MjI5OX0.2twPl45u4w-AfeZqqe5KTmy1Tly6pJK70sa9IntPn78",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/affan/OneDrive/Desktop/curApp/wallet.csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/users/whiteList",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"whiteList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update a user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODkyOTc0YjJhOWFjOWI3YjhkYzYwYyIsImlhdCI6MTczNzA0MjI5OX0.2twPl45u4w-AfeZqqe5KTmy1Tly6pJK70sa9IntPn78",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"twitterUsername\":\"test a\",\r\n    \"isWhiteListed\" :  true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/users/update/:id",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"update",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "678298884b11906bf103980c"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sign in",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\" : \"testAdim@gmail.com\",\r\n    \"password\" : \"Concept@1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/admin/signin",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sign up",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\" : \"testAdim@gmail.com\",\r\n    \"password\" : \"Concept@1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/admin/signup",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "leader board",
+			"item": [
+				{
+					"name": "get todays data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/v1/leaderboard/today",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"leaderboard",
+								"today"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get leader board with date range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/v1/leaderboard?startDate=2025-01-15&endDate=2025-01-16",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"leaderboard"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-01-15"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-01-16"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	]
+}

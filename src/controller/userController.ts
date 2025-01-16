@@ -63,6 +63,14 @@ const userController = () => {
       const { userId } = req;
       console.log("user", userId);
       const existingUser = await User.findById(userId);
+      if (!existingUser) {
+        return sendErrorResponse({
+          req,
+          res,
+          error: "token has been expired",
+          statusCode: 404,
+        });
+      }
       return sendSuccessResponse({
         res,
         data: { user: existingUser },

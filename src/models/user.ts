@@ -14,6 +14,7 @@ export interface IUser extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   role: USERROLE;
+  isWhiteListed: boolean
 }
 
 const userSchema = new Schema<IUser>(
@@ -29,7 +30,7 @@ const userSchema = new Schema<IUser>(
       required: true,
       default: new Date("2025-01-01"), //update it according to project start time
     },
-
+    isWhiteListed: { type: Boolean, default: false },
     role: {
       type: String,
       default: USERROLE.USER,

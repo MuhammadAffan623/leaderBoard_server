@@ -8,6 +8,7 @@ import userActivityService from "../service/userActivity";
 import mongoose from "mongoose";
 import cronDailyRewardService from "../service/cronDailyReward";
 import rewardPriceService from "../service/rewardPrice";
+import logger from "../utils/logger";
 
 const tweetService = twitterService();
 const activityService = userActivityService();
@@ -36,10 +37,11 @@ const processTweetIdsInBatches = async (
         await new Promise((resolve) => setTimeout(resolve, PAUSE_DURATION_MS));
       }
     } catch (error) {
-      console.error(
+      logger.error(
         `Error processing batch ${Math.floor(i / BATCH_SIZE) + 1}:`,
         error
       );
+      logger.error(error);
       throw new Error(
         `Error processing batch ${Math.floor(i / BATCH_SIZE) + 1}`
       );
@@ -55,27 +57,21 @@ const processUserData = async (user: IUser): Promise<void> => {
   session.startTransaction();
 
   try {
-    console.log(`Processing user: ${user.id}`);
+    logger.info(`Processing user: ${user._id}`);
     const userActivity = await UserActivity.findOne({ userId: user._id });
 
     const { newTweets, newRetweet, newComments }: GetUserNewDataReturn =
       await tweetService.getUserNewTweetsData(
-        user.id,
+        user.twitterId,
         user.fetchDateTime.toISOString()
       );
 
     // Process tweet IDs
     const newTweetsIds = newTweets.map((item) => item.id);
-    const uniqueTweetIds = await mergeArrays(
-      newTweetsIds,
-      userActivity?.tweetIds ?? []
-    );
-
-    // Process retweet IDs
     const newRetweetIds = newRetweet.map((item) => item.id);
-    const uniqueRetweetIds = await mergeArrays(
-      newRetweetIds,
-      userActivity?.retweetIds ?? []
+    const uniqueTweetIds = await mergeArrays(
+      [...newTweetsIds, ...newRetweetIds],
+      userActivity?.tweetIds ?? []
     );
 
     // Process comment IDs
@@ -85,35 +81,33 @@ const processUserData = async (user: IUser): Promise<void> => {
       userActivity?.commentIds ?? []
     );
 
-    const allTweetIds = [
-      ...uniqueCommentIds,
-      ...uniqueRetweetIds,
-      ...uniqueTweetIds,
-    ];
+    const allTweetIds = [...uniqueCommentIds, ...uniqueTweetIds];
 
     const allTweetResponse = await processTweetIdsInBatches(allTweetIds);
 
     // Calculate metrics
-    const { impressionsCount, retweetCounts } = allTweetResponse.reduce(
-      (acc, item) => ({
-        impressionsCount:
-          acc.impressionsCount + (item?.public_metrics?.impression_count ?? 0),
-        retweetCounts:
-          acc.retweetCounts + (item?.public_metrics?.retweet_count ?? 0),
-      }),
-      { impressionsCount: 0, retweetCounts: 0 }
-    );
+    const { impressionsCount, retweetCounts, commentRecieved } =
+      allTweetResponse.reduce(
+        (acc, item) => ({
+          impressionsCount:
+            acc.impressionsCount +
+            (item?.public_metrics?.impression_count ?? 0),
+          retweetCounts:
+            acc.retweetCounts + (item?.public_metrics?.retweet_count ?? 0),
+          commentRecieved:
+            acc.commentRecieved + (item?.public_metrics?.reply_count ?? 0),
+        }),
+        { impressionsCount: 0, retweetCounts: 0, commentRecieved: 0 }
+      );
 
     const totalTweetCount = uniqueTweetIds.length;
-    const totalRetweetCount = uniqueRetweetIds.length;
     const totalCommentCount = uniqueCommentIds.length;
 
     // Update user activity
     await activityService.createOrUpdateUserActivity(
-      user.id,
+      user._id as string,
       {
         tweetIds: uniqueTweetIds,
-        retweetIds: uniqueRetweetIds,
         commentIds: uniqueCommentIds,
       },
       session
@@ -128,10 +122,10 @@ const processUserData = async (user: IUser): Promise<void> => {
     const totalPrice =
       (latestReward.impressionReward || 0) * impressionsCount +
       (latestReward.tweetsReward || 0) * totalTweetCount +
-      (latestReward.retweetsReward || 0) * totalRetweetCount +
+      (latestReward.retweetsReward || 0) * retweetCounts +
       (latestReward.spacesAttendedReward || 0) * 0 + // Not implemented yet
       (latestReward.telegramReward || 0) * 0 + // Not implemented yet
-      (latestReward.commentReward || 0) * totalCommentCount;
+      (latestReward.commentReward || 0) * commentRecieved;
 
     const userTotalCronRewards: TotalCounts =
       await cronDailyService.getAllCronReward(user._id as string);
@@ -148,13 +142,13 @@ const processUserData = async (user: IUser): Promise<void> => {
       ),
       retweetCounts: await getDifference(
         userTotalCronRewards.totalRetweetCount,
-        totalRetweetCount
+        retweetCounts
       ),
       spacesAttendedCount: 0,
       telegramMessagesCount: 0,
       commentCounts: await getDifference(
         userTotalCronRewards.totalCommentCounts,
-        totalCommentCount
+        commentRecieved
       ),
       calculatedReward: await getDifference(
         totalPrice,
@@ -162,10 +156,16 @@ const processUserData = async (user: IUser): Promise<void> => {
       ),
     };
 
-    await cronDailyService.createCronDailyReward(userDailyReward);
+    await cronDailyService.createCronDailyReward(userDailyReward, session);
+    await User.findByIdAndUpdate(
+      user._id,
+      { $set: { fetchDateTime: new Date() } },
+      { new: true }
+    );
     await session.commitTransaction();
-    console.log(`Successfully processed user: ${user.id}`);
+    logger.info(`Successfully processed user: ${user._id}`);
   } catch (error) {
+    logger.error(error);
     await session.abortTransaction();
     console.error(`Error processing user ${user.id}:`, error);
     throw error;
@@ -181,8 +181,10 @@ export const twitterCron = async () => {
   try {
     const allUsers: IUser[] = await User.find({ role: USERROLE.USER }).lean();
     console.log(`Found ${allUsers.length} users to process`);
-
+    // let count = false;
     for (const user of allUsers) {
+      // if (count) break;
+      // count = true;
       await processUserData(user);
     }
 
@@ -191,9 +193,8 @@ export const twitterCron = async () => {
       success: true,
     };
   } catch (error) {
-    console.error("Critical error in Twitter cron job:", error);
+    logger.error("Critical error in Twitter cron job:", error);
+    logger.error(error);
     throw error;
   }
 };
-
-export default twitterCron;

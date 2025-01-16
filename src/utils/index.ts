@@ -83,7 +83,7 @@ export const matchKeywordInString = async (
 };
 
 export const isKeywordinPost = (text: string): boolean => {
-  const keywords = ["@tardionmoon", "$TARDI", "tardi", "TARDI"];
+  const keywords = ["@tardionmoon", "$TARDI", "tardi", "TARDI","@Tardionmoon"];
   return keywords.some((keyword) => text.includes(keyword));
 };
 

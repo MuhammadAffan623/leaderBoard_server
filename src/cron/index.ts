@@ -3,8 +3,8 @@ import { twitterCron } from "./twitterCron2";
 import { createDailyLeaderboard } from "./leaderboard";
 // import { twitterCron } from "./twitterCron";
 
-const cronSchedule = "*/1 * * * * *"; // Runs every second
-// const cronSchedule = "0 0 * * *"; // Once at midnight
+// const cronSchedule = "*/1 * * * * *"; // Runs every second
+const cronSchedule = "0 0 * * *"; // Once at midnight
 let done = false;
 const cronJob = async (): Promise<void> => {
   if (done) return;

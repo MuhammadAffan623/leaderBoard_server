@@ -3,6 +3,9 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { config } from "../config";
 import { CustomRequest } from "../types";
 import { User, USERROLE } from "../models/user";
+import { Admin } from "../models/admin";
+import logger from "./logger";
+import { sendErrorResponse } from "./response";
 
 export const createToken = async (
   user: Record<string, any>
@@ -83,7 +86,7 @@ export const matchKeywordInString = async (
 };
 
 export const isKeywordinPost = (text: string): boolean => {
-  const keywords = ["@tardionmoon", "$TARDI", "tardi", "TARDI","@Tardionmoon"];
+  const keywords = ["@tardionmoon", "$TARDI", "tardi", "TARDI", "@Tardionmoon"];
   return keywords.some((keyword) => text.includes(keyword));
 };
 
@@ -110,3 +113,53 @@ export async function getDifference(number1: number, number2: number) {
 //   );
 //   return count;
 // }
+
+export const authenticateAdmin = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  logger.info("Authenticating admin in authenticateAdmin");
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    sendErrorResponse({
+      req,
+      res,
+      error: "Unauthorized: No token provided!",
+      statusCode: 401,
+    });
+    return;
+  }
+
+  try {
+    // Verify the JWT token
+    const decoded = jwt.verify(token, config.jwt_secret) as JwtPayload;
+    logger.info("decoded response => ", decoded);
+    req.userId = decoded.id;
+
+    // Check if admin exists in the database
+    const admin = await Admin.findById(req.userId);
+    logger.info(`Admin =>`, admin);
+    if (!admin) {
+      sendErrorResponse({
+        req,
+        res,
+        error: "Unauthorized: Your are not authorized for this method",
+        statusCode: 401,
+      });
+      return;
+    }
+
+    // Proceed to the next middleware or route handler
+    next();
+  } catch (error) {
+    logger.error("Authentication error:", error);
+    sendErrorResponse({
+      req,
+      res,
+      error: "Unauthorized: Invalid or expired token!",
+      statusCode: 401,
+    });
+  }
+};

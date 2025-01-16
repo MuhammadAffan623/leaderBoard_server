@@ -6,7 +6,10 @@ import logger from "./utils/logger";
 import { config } from "./config";
 import Mongo from "./config/database";
 import router from "./routes";
-// import "./cron";
+import "./config/passport";
+import passport from "passport";
+import session from "express-session";
+import "./cron";
 const app = express();
 const server = http.createServer(app);
 const PORT = config.port;
@@ -22,6 +25,18 @@ const corsOptions = {
   app.get("/", (req, res) => {
     res.send("SERVER IS RUNNING ");
   });
+  // Session setup
+  app.use(
+    session({
+      secret: config.jwt_secret,
+      resave: false,
+      saveUninitialized: true,
+    })
+  );
+
+  // Initialize Passport
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use("/api/v1", router);
   // Initialize sockets
   server.listen(PORT, () => {

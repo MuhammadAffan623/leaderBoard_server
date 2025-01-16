@@ -16,6 +16,8 @@ interface Config {
   port: number;
   mongo_uri: string;
   jwt_secret: string;
+  twitter_consumer_key: string;
+  twitter_consumer_secret: string;
 }
 
 // Initialize the configuration object
@@ -23,6 +25,8 @@ export const config: Config = {
   port: parseInt(process.env.PORT || "5000", 10),
   mongo_uri: process.env.MONGO_URI || "",
   jwt_secret: process.env.JWT_SECRET || "",
+  twitter_consumer_key: process.env.TWITTER_CONSUMER_KEY || "",
+  twitter_consumer_secret: process.env.TWITTER_CONSUMER_SECRET || "",
 };
 
 // Function to get the Twitter client

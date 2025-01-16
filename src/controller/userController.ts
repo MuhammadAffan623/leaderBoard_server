@@ -6,6 +6,8 @@ import { createToken } from "../utils";
 import { CustomRequest } from "../types";
 import fs from "fs";
 import { parseCsv } from "../utils/csvParser";
+import passport from "passport";
+
 const userController = () => {
   const getOrCreateUser = async (req: Request, res: Response) => {
     logger.info(`userController get or create user`);
@@ -320,7 +322,20 @@ const userController = () => {
       });
     }
   };
-
+  const login = passport.authenticate("twitter");
+  const twitterCallback = passport.authenticate("twitter", {
+    // successRedirect: "http://localhost:5173/twitterSuccess", //fe path to get
+    failureRedirect: "/login",
+  });
+  const twitterCallbackToken = async (req: CustomRequest, res: Response) => {
+    console.log("req.user", req.user);
+    console.log("req.user", req?.session);
+    const user = req.user;
+    if (!user) return;
+    const token = await createToken(user);
+    console.log("token==>", { token });
+    return res.redirect(`http://localhost:5173/twitterSuccess?token=${token}`);
+  };
   return {
     getOrCreateUser,
     getUserbyToken,
@@ -328,6 +343,9 @@ const userController = () => {
     whiteListUser,
     adminUpdateUser,
     updateUser,
+    login,
+    twitterCallback,
+    twitterCallbackToken,
   };
 };
 

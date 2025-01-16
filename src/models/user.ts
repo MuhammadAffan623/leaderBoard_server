@@ -14,15 +14,17 @@ export interface IUser extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   role: USERROLE;
-  isWhiteListed: boolean
+  isWhiteListed: boolean;
+  profileImage: string;
 }
 
 const userSchema = new Schema<IUser>(
   {
     twitterId: { type: String, required: true, unique: true },
-    walletAddress: { type: String, required: true, unique: true },
+    walletAddress: { type: String, unique: true },
     telegramId: { type: String },
     twitterUsername: { type: String },
+    profileImage: { type: String },
 
     isProgramMember: { type: Boolean, default: false },
     fetchDateTime: {

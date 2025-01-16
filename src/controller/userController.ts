@@ -81,7 +81,7 @@ const userController = () => {
     logger.info(`userController get all users`);
     try {
       const { page = 1, limit = 10, search } = req.query;
-      const query: any = {};
+      const query: any = { role: "USER" }; // Ensure we only fetch users with role USER
 
       if (search) {
         query.$or = [
@@ -215,11 +215,119 @@ const userController = () => {
     }
   };
 
+  const adminUpdateUser = async (req: Request, res: Response) => {
+    logger.info("userController admin update user");
+    try {
+      const { id } = req.params; // Extract user ID from the route parameter
+      const updates = req.body; // Extract update keys and values from the request body
+
+      // Validate that the updates object is not empty
+      if (!updates || Object.keys(updates).length === 0) {
+        logger.error(`Error updating user ==> `);
+        sendErrorResponse({
+          req,
+          res,
+          error: "No updates provided",
+          statusCode: 400,
+        });
+        return;
+      }
+
+      // Find the user by ID and update the fields
+      const updatedUser = await User.findByIdAndUpdate(id, updates, {
+        new: true, // Return the updated document
+        runValidators: true, // Run schema validations
+      });
+
+      // If the user does not exist
+      if (!updatedUser) {
+        logger.error(`Error updating user ==> `);
+        sendErrorResponse({
+          req,
+          res,
+          error: "User not found",
+          statusCode: 404,
+        });
+        return;
+      }
+
+      // Respond with the updated user
+      sendSuccessResponse({
+        res,
+        data: { updatedUser },
+        message: "User updated successfully",
+      });
+    } catch (error) {
+      logger.error(`Error updating user ==> `, error.message);
+      sendErrorResponse({
+        req,
+        res,
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  };
+
+  const updateUser = async (req: CustomRequest, res: Response) => {
+    logger.info("userController update user");
+    try {
+      const { userId } = req;
+      const updates = req.body; // Extract update keys and values from the request body
+
+      // Validate that the updates object is not empty
+      if (!updates || Object.keys(updates).length === 0) {
+        logger.error(`Error updating user ==> `);
+        sendErrorResponse({
+          req,
+          res,
+          error: "No updates provided",
+          statusCode: 400,
+        });
+        return;
+      }
+
+      // Find the user by ID and update the fields
+      const updatedUser = await User.findByIdAndUpdate(userId, updates, {
+        new: true, // Return the updated document
+        runValidators: true, // Run schema validations
+      });
+
+      // If the user does not exist
+      if (!updatedUser) {
+        logger.error(`Error updating user ==> `);
+        sendErrorResponse({
+          req,
+          res,
+          error: "User not found",
+          statusCode: 404,
+        });
+        return;
+      }
+
+      // Respond with the updated user
+      sendSuccessResponse({
+        res,
+        data: { updatedUser },
+        message: "User updated successfully",
+      });
+    } catch (error) {
+      logger.error(`Error updating user ==> `, error.message);
+      sendErrorResponse({
+        req,
+        res,
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  };
+
   return {
     getOrCreateUser,
     getUserbyToken,
     getAllUsers,
     whiteListUser,
+    adminUpdateUser,
+    updateUser,
   };
 };
 

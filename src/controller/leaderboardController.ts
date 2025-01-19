@@ -13,7 +13,8 @@ const leaderboardController = () => {
       const tomorrow = new Date(today);
       tomorrow.setUTCDate(today.getUTCDate() + 1); // Start of the next day
 
-      logger.info({ today, tomorrow }); // Debugging
+      logger.info("today ==> ",today); // Debugging
+      logger.info("tomorrow ==> ",tomorrow); // Debugging
 
       // Fetch leaderboard data for today
       const lboard = await Leaderboard.find({
@@ -21,7 +22,12 @@ const leaderboardController = () => {
           $gte: today, // Greater than or equal to today
           $lt: tomorrow, // Less than tomorrow
         },
-      }).sort("rank");
+      })
+        .sort("rank")
+        .populate({
+          path: "userId", // Populate the userId field
+          select: "twitterUsername walletAddress isWhiteListed profileImage", // Select specific fields to include from User
+        });
 
       sendSuccessResponse({
         res,
@@ -47,7 +53,7 @@ const leaderboardController = () => {
     res: Response
   ): Promise<void> => {
     try {
-      logger.info("get leader bord woth date range")
+      logger.info("get leader bord woth date range");
       // Parse start and end dates from the request query or body
       const { startDate, endDate } = req.query;
 

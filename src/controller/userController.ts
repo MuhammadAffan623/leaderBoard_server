@@ -7,6 +7,8 @@ import { CustomRequest } from "../types";
 import fs from "fs";
 import { parseCsv } from "../utils/csvParser";
 import passport from "passport";
+import { config } from "../config";
+import { Types } from "mongoose";
 
 const userController = () => {
   const getOrCreateUser = async (req: Request, res: Response) => {
@@ -23,15 +25,51 @@ const userController = () => {
         });
       }
       const existingUser = await User.findOne({ walletAddress });
-      if (existingUser) {
-        logger.info(`User found with wallet address: ${walletAddress}`);
-        const token = await createToken(existingUser);
-        sendSuccessResponse({
-          res,
-          data: { user: existingUser, token },
-          message: "User fetched successfully",
-        });
+      const existingUserId = await User.findOne({ twitterId });
+
+      if (existingUser?._id && existingUserId?._id) {
+        if (
+          (existingUser._id as Types.ObjectId).equals(
+            existingUserId._id as Types.ObjectId
+          )
+        ) {
+          const token = await createToken(existingUser);
+          sendSuccessResponse({
+            res,
+            data: { user: existingUser, token },
+            message: "User created successfully",
+          });
+        } else {
+          const updatedUser = await User.findByIdAndUpdate(
+            existingUser._id,
+            {
+              twitterId: existingUserId.twitterId,
+              twitterUsername: existingUserId.twitterUsername,
+              profileImage: existingUserId.profileImage,
+            },
+            {
+              new: true,
+            }
+          ).lean();
+          if (!updatedUser) {
+            return sendErrorResponse({
+              req,
+              res,
+              error: "Failed to update user",
+              statusCode: 500,
+            });
+          }
+          await User.findByIdAndDelete(existingUserId._id);
+          //complete here
+          const token = await createToken(updatedUser);
+          sendSuccessResponse({
+            res,
+            data: { user: updatedUser, token },
+            message: "User created successfully, merged",
+          });
+        }
       } else {
+        // this is for testing; creating user with endpoint
         logger.info(
           `User not found with wallet address: ${walletAddress}, creating new user `
         );
@@ -57,7 +95,6 @@ const userController = () => {
       });
     }
   };
-
   const getUserbyToken = async (req: CustomRequest, res: Response) => {
     try {
       const { userId } = req;
@@ -342,7 +379,7 @@ const userController = () => {
     if (!user) return;
     const token = await createToken(user);
     console.log("token==>", { token });
-    return res.redirect(`http://localhost:5173/twitterSuccess?token=${token}`);
+    return res.redirect(`${config.frontend_url}/twitterSuccess?token=${token}`);
   };
   return {
     getOrCreateUser,

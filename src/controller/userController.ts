@@ -49,7 +49,7 @@ const userController = () => {
           const updatedUser = await User.findByIdAndUpdate(
             existingUser._id,
             {
-              twitterId: existingUserId.twitterId,
+              twitterId: existingUser.twitterId,
               twitterUsername: existingUserId.twitterUsername,
               profileImage: existingUserId.profileImage,
               telegramId: existingUser.telegramId || existingUserId.telegramId,

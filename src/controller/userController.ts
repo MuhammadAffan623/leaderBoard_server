@@ -8,11 +8,13 @@ import fs from "fs";
 import { parseCsv } from "../utils/csvParser";
 import passport from "passport";
 import { config } from "../config";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 const userController = () => {
   const getOrCreateUser = async (req: Request, res: Response) => {
     logger.info(`userController get or create user`);
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
       const { walletAddress, twitterId } = req.body;
 
@@ -24,8 +26,10 @@ const userController = () => {
           statusCode: 404,
         });
       }
-      const existingUser = await User.findOne({ walletAddress });
-      const existingUserId = await User.findOne({ twitterId });
+      const existingUser = await User.findOne({ walletAddress }).session(
+        session
+      );
+      const existingUserId = await User.findOne({ twitterId }).session(session);
 
       if (existingUser?._id && existingUserId?._id) {
         if (
@@ -34,6 +38,8 @@ const userController = () => {
           )
         ) {
           const token = await createToken(existingUser);
+          await session.commitTransaction();
+          session.endSession();
           sendSuccessResponse({
             res,
             data: { user: existingUser, token },
@@ -49,9 +55,12 @@ const userController = () => {
             },
             {
               new: true,
+              session,
             }
           ).lean();
           if (!updatedUser) {
+            await session.abortTransaction();
+            session.endSession();
             return sendErrorResponse({
               req,
               res,
@@ -59,8 +68,10 @@ const userController = () => {
               statusCode: 500,
             });
           }
-          await User.findByIdAndDelete(existingUserId._id);
+          await User.findByIdAndDelete(existingUserId._id, { session });
           //complete here
+          await session.commitTransaction();
+          session.endSession();
           const token = await createToken(updatedUser);
           sendSuccessResponse({
             res,
@@ -74,8 +85,10 @@ const userController = () => {
           `User not found with wallet address: ${walletAddress}, creating new user `
         );
         const newUser = new User({ walletAddress, twitterId });
-        const savedUser = await newUser.save();
+        const savedUser = await newUser.save({ session });
         const token = await createToken(savedUser);
+        await session.commitTransaction();
+        session.endSession();
         sendSuccessResponse({
           res,
           data: { user: savedUser, token },
@@ -83,6 +96,8 @@ const userController = () => {
         });
       }
     } catch (error) {
+      await session.abortTransaction(); // Rollback on error
+      session.endSession();
       logger.error(
         `Error while getting user by wallet address ==> `,
         error.message

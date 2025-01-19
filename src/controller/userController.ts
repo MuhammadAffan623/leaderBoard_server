@@ -52,6 +52,7 @@ const userController = () => {
               twitterId: existingUserId.twitterId,
               twitterUsername: existingUserId.twitterUsername,
               profileImage: existingUserId.profileImage,
+              telegramId: existingUser.telegramId || existingUserId.telegramId,
             },
             {
               new: true,
@@ -127,15 +128,20 @@ const userController = () => {
 
       const existingUser = await User.findOne({ walletAddress });
       if (existingUser && existingUser.isWhiteListed) {
+        const token = await createToken(existingUser);
         return sendSuccessResponse({
           res,
-          data: { isWhitelist: true },
+          data: { isWhitelist: true, user: existingUser, token },
           message: "wallet address is white listed",
         });
-      } else {
+      }
+      if (!existingUser) {
+        const newUser = new User({ walletAddress, isWhiteListed: false });
+        const savedUser = await newUser.save();
+        const token = await createToken(savedUser);
         return sendSuccessResponse({
           res,
-          data: { isWhitelist: false },
+          data: { isWhitelist: false, user: savedUser, token },
           message: "wallet address is not white listed",
         });
       }
@@ -144,6 +150,53 @@ const userController = () => {
         `Error while checking user whotelist status==> `,
         error.message
       );
+      sendErrorResponse({
+        req,
+        res,
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  };
+
+  const addTelegram = async (req: CustomRequest, res: Response) => {
+    try {
+      const { userId } = req;
+      const { telegramId } = req.body;
+      console.log("user", userId);
+      const existingUser = await User.findById(userId);
+      if (!existingUser) {
+        return sendErrorResponse({
+          req,
+          res,
+          error: "token has been expired",
+          statusCode: 404,
+        });
+      }
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { telegramId },
+        {
+          new: true, // Return the updated document
+          runValidators: true, // Run schema validations
+        }
+      );
+      if (!updatedUser) {
+        return sendErrorResponse({
+          req,
+          res,
+          error: "failed to add telegram",
+          statusCode: 500,
+        });
+      }
+      const token = await createToken(updatedUser);
+      return sendSuccessResponse({
+        res,
+        data: { user: updatedUser, token },
+        message: "add telegram successfully",
+      });
+    } catch (error) {
+      logger.error(`Error while fetching all users ==> `, error.message);
       sendErrorResponse({
         req,
         res,
@@ -449,6 +502,7 @@ const userController = () => {
     twitterCallback,
     twitterCallbackToken,
     checkWhiteList,
+    addTelegram,
   };
 };
 

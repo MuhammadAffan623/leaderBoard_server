@@ -135,6 +135,14 @@ const userController = () => {
           message: "wallet address is white listed",
         });
       }
+      if (existingUser && !existingUser.isWhiteListed) {
+        const token = await createToken(existingUser);
+        return sendSuccessResponse({
+          res,
+          data: { isWhitelist: false, user: existingUser, token },
+          message: "wallet address is not white listed",
+        });
+      }
       if (!existingUser) {
         const newUser = new User({ walletAddress, isWhiteListed: false });
         const savedUser = await newUser.save();

@@ -30,7 +30,6 @@ const userController = () => {
         session
       );
       const existingUserId = await User.findOne({ twitterId }).session(session);
-
       if (existingUser?._id && existingUserId?._id) {
         if (
           (existingUser._id as Types.ObjectId).equals(
@@ -49,7 +48,7 @@ const userController = () => {
           const updatedUser = await User.findByIdAndUpdate(
             existingUser._id,
             {
-              twitterId: existingUser.twitterId,
+              twitterId: existingUserId.twitterId,
               twitterUsername: existingUserId.twitterUsername,
               profileImage: existingUserId.profileImage,
               telegramId: existingUser.telegramId || existingUserId.telegramId,

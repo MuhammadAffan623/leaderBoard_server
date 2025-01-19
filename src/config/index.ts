@@ -19,6 +19,7 @@ interface Config {
   twitter_consumer_key: string;
   twitter_consumer_secret: string;
   frontend_url: string;
+  backend_url: string;
 }
 
 // Initialize the configuration object
@@ -29,6 +30,7 @@ export const config: Config = {
   twitter_consumer_key: process.env.TWITTER_CONSUMER_KEY || "",
   twitter_consumer_secret: process.env.TWITTER_CONSUMER_SECRET || "",
   frontend_url: process.env.FRONTEND_URL || "",
+  backend_url: process.env.BACKEND_URL || "",
 };
 
 // Function to get the Twitter client

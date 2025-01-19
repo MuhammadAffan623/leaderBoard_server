@@ -53,6 +53,7 @@ const userController = () => {
               twitterUsername: existingUserId.twitterUsername,
               profileImage: existingUserId.profileImage,
               telegramId: existingUser.telegramId || existingUserId.telegramId,
+              walletAddress: existingUser.walletAddress,
             },
             {
               new: true,

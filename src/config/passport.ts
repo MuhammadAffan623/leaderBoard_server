@@ -36,7 +36,7 @@ passport.use(
     {
       consumerKey: TWITTER_CONSUMER_KEY,
       consumerSecret: TWITTER_CONSUMER_SECRET,
-      callbackURL: "http://localhost:5000/api/v1/users/twitterCallback", // be callback url
+      callbackURL: `${config.backend_url}/users/twitterCallback`, // be callback url
       //   callbackURL: "http://localhost:5173/twitterSuccess",
     },
     async (token, tokenSecret, profile, done) => {

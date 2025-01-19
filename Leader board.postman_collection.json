@@ -17,7 +17,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"walletAddress\":\"0x778945116X11\",\r\n    \"twitterId\":\"02\"\r\n}",
+							"raw": "{\r\n    \"walletAddress\":\"abc\",\r\n    \"twitterId\":\"1320992880329195522\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -171,6 +171,70 @@
 									"value": "10",
 									"disabled": true
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "is user whitelist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"walletAddress\" : \"abxc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/users/isWhiteList",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"isWhiteList"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add telegram on wallet address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3OGQxZTNjZGExNTgzYjdhODJiNWFhMiIsImlhdCI6MTczNzMwMTU2NH0.kOcSoEfecDbcUqKuPQW6ak7wdB94CXqlne4eg5FY9js",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"telegramId\" : \"abc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/api/v1/users/addTelegram",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"addTelegram"
 							]
 						}
 					},

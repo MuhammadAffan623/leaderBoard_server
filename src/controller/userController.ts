@@ -497,7 +497,7 @@ const userController = () => {
     if (!user) return;
     const token = await createToken(user);
     console.log("token==>", { token });
-    return res.redirect(`${config.frontend_url}/twitterSuccess?token=${token}`);
+    return res.redirect(`${config.frontend_url}?twitterToken=${token}`);
   };
   return {
     getOrCreateUser,

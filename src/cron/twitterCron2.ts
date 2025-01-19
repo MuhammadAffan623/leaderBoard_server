@@ -185,7 +185,9 @@ export const twitterCron = async () => {
     for (const user of allUsers) {
       // if (count) break;
       // count = true;
-      await processUserData(user);
+      if (user?.twitterId) {
+        await processUserData(user);
+      }
     }
 
     // Return processing results

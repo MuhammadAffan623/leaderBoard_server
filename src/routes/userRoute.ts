@@ -7,6 +7,7 @@ const user = userController();
 const userRouter = Router();
 
 userRouter.post("/", user.getOrCreateUser);
+userRouter.post("/isWhiteList", user.checkWhiteList);
 userRouter.get("/", decodeTokenFromRequest, user.getUserbyToken);
 // update user endpoint
 userRouter.post("/me", decodeTokenFromRequest, user.updateUser);

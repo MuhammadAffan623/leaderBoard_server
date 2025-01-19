@@ -20,8 +20,8 @@ export interface IUser extends Document {
 
 const userSchema = new Schema<IUser>(
   {
-    twitterId: { type: String, required: true, unique: true },
-    walletAddress: { type: String, unique: true },
+    twitterId: { type: String, required: true },
+    walletAddress: { type: String },
     telegramId: { type: String },
     twitterUsername: { type: String },
     profileImage: { type: String },

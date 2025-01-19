@@ -110,6 +110,48 @@ const userController = () => {
       });
     }
   };
+
+  const checkWhiteList = async (req: Request, res: Response) => {
+    logger.info("checking is the wallet white listed ");
+    try {
+      const { walletAddress } = req.body;
+      logger.info("walletAddress => ", walletAddress);
+      if (!walletAddress) {
+        return sendErrorResponse({
+          req,
+          res,
+          error: "wallet address is required",
+          statusCode: 404,
+        });
+      }
+
+      const existingUser = await User.findOne({ walletAddress });
+      if (existingUser && existingUser.isWhiteListed) {
+        return sendSuccessResponse({
+          res,
+          data: { isWhitelist: true },
+          message: "wallet address is white listed",
+        });
+      } else {
+        return sendSuccessResponse({
+          res,
+          data: { isWhitelist: false },
+          message: "wallet address is not white listed",
+        });
+      }
+    } catch (error) {
+      logger.error(
+        `Error while checking user whotelist status==> `,
+        error.message
+      );
+      sendErrorResponse({
+        req,
+        res,
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  };
   const getUserbyToken = async (req: CustomRequest, res: Response) => {
     try {
       const { userId } = req;
@@ -253,7 +295,7 @@ const userController = () => {
         await User.findOneAndUpdate(
           { walletAddress },
           { isWhiteListed: true },
-          { new: true }
+          { new: true, upsert: true }
         );
       }
       // Delete the file after processing
@@ -406,6 +448,7 @@ const userController = () => {
     login,
     twitterCallback,
     twitterCallbackToken,
+    checkWhiteList,
   };
 };
 

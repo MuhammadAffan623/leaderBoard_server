@@ -5,10 +5,10 @@ import { createDailyLeaderboard } from "./leaderboard";
 
 // const cronSchedule = "*/1 * * * * *"; // Runs every second
 const cronSchedule = "0 0 * * *"; // Once at midnight
-let done = false;
+// let done = false;
 const cronJob = async (): Promise<void> => {
-  if (done) return;
-  done = true;
+  // if (done) return;
+  // done = true;
   // cron to update user twitter data
   const result = await twitterCron();
   if (result.success) {

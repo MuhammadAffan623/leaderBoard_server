@@ -9,8 +9,10 @@ import { parseCsv } from "../utils/csvParser";
 import passport from "passport";
 import { config } from "../config";
 import mongoose, { Types } from "mongoose";
+import dailyRewardService from "../service/dailyReward";
 
 const userController = () => {
+  const dailyReward = dailyRewardService();
   const getOrCreateUser = async (req: Request, res: Response) => {
     logger.info(`userController get or create user`);
     const session = await mongoose.startSession();
@@ -282,6 +284,124 @@ const userController = () => {
     }
   };
 
+  const getAllUserDetailed = async (req: Request, res: Response) => {
+    logger.info(`userController get all users`);
+    try {
+      const { userId } = req.body;
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0); // Set to midnight UTC
+      const tomorrow = new Date(today);
+      tomorrow.setUTCDate(today.getUTCDate() + 1); // Start of the next day
+
+      const userTotalReward = await User.aggregate([
+        {
+          $match: { _id: new Types.ObjectId(userId) },
+        },
+        {
+          $lookup: {
+            from: "leaderboards",
+            let: { userId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$userId", "$$userId"] },
+                      { $gte: ["$date", today] }, // Replace "date" with the correct date field in your leaderboards collection
+                      { $lte: ["$date", tomorrow] },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: "userRewardDetails",
+          },
+        },
+        {
+          $unwind: {
+            path: "$userRewardDetails",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+      ]);
+      sendSuccessResponse({
+        res,
+        data: {
+          // users,
+          // totalUsers,
+          user: userTotalReward?.[0],
+          // totalPages: Math.ceil(totalUsers / Number(limit)),
+          // currentPage: Number(page),
+        },
+        message: "Users fetched successfully",
+      });
+    } catch (error) {
+      logger.error(`Error while fetching all users ==> `, error.message);
+      sendErrorResponse({
+        req,
+        res,
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  };
+  const getAllUsersRank = async (req: Request, res: Response) => {
+    logger.info(`userController get all users`);
+    try {
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0); // Set to midnight UTC
+      const tomorrow = new Date(today);
+      tomorrow.setUTCDate(today.getUTCDate() + 1); // Start of the next day
+
+      const userTotalReward = await User.aggregate([
+        {
+          $lookup: {
+            from: "leaderboards",
+            let: { userId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$userId", "$$userId"] },
+                      { $gte: ["$date", today] }, // Replace "date" with the correct date field in your leaderboards collection
+                      { $lte: ["$date", tomorrow] },
+                    ],
+                  },
+                },
+              },
+            ],
+            as: "userRewardDetails",
+          },
+        },
+        {
+          $unwind: {
+            path: "$userRewardDetails",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $sort: { "userRewardDetails.score": -1 }, // Correct sorting syntax
+        },
+      ]);
+      sendSuccessResponse({
+        res,
+        data: {
+          total: userTotalReward?.length,
+          users: userTotalReward,
+        },
+        message: "Users fetched successfully",
+      });
+    } catch (error) {
+      logger.error(`Error while fetching all users ==> `, error.message);
+      sendErrorResponse({
+        req,
+        res,
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  };
   // const createAdmin = async (req: Request, res: Response) => {
   //   logger.info(`userController get or create user`);
   //   try {
@@ -511,6 +631,8 @@ const userController = () => {
     twitterCallbackToken,
     checkWhiteList,
     addTelegram,
+    getAllUsersRank,
+    getAllUserDetailed,
   };
 };
 

@@ -22,6 +22,8 @@ userRouter.post(
 // admin update
 userRouter.post("/update/:id", authenticateAdmin, user.adminUpdateUser);
 userRouter.get("/all", user.getAllUsers);
+userRouter.get("/all/detailed", user.getAllUsersRank);
+userRouter.post("/specific/detailed", user.getAllUserDetailed);
 userRouter.get("/twitterlogin", user.login);
 userRouter.get(
   "/twitterCallback",

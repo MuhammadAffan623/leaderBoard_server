@@ -7,6 +7,21 @@ const leaderBoardService = () => {
     leaderboardData: CreateLeaderboardObject[],
     session?: ClientSession
   ) => {
+    // delete todays leaderboard data created earlier
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0); // Set to midnight UTC
+    const tomorrow = new Date(today);
+    tomorrow.setUTCDate(today.getUTCDate() + 1); // Start of the next day
+
+    await Leaderboard.deleteMany(
+      {
+        date: {
+          $gte: today,
+          $lte: tomorrow,
+        },
+      },
+      { session }
+    );
     const result = await Leaderboard.insertMany(leaderboardData, {
       session,
       ordered: true, // Ensures the operation stops at the first error

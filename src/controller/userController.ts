@@ -500,6 +500,39 @@ const userController = () => {
     }
   };
 
+  const whiteListSpecificUser = async (req: Request, res: Response) => {
+    logger.info("white list user with address");
+    try {
+      const { walletAddress } = req.body;
+      if (!walletAddress) {
+        sendErrorResponse({
+          req,
+          res,
+          error: "walletAddress is required",
+          statusCode: 500,
+        });
+        return;
+      }
+      // Update user's isWishlist value to true if user exists
+      await User.findOneAndUpdate(
+        { walletAddress },
+        { isWhiteListed: true },
+        { new: true, upsert: true }
+      );
+      sendSuccessResponse({
+        res,
+        message: "User white listed successfully",
+      });
+    } catch (error) {
+      logger.error(`Error while white listing the user ==> `, error.message);
+      sendErrorResponse({
+        req,
+        res,
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  };
   const adminUpdateUser = async (req: Request, res: Response) => {
     logger.info("userController admin update user");
     try {
@@ -633,6 +666,7 @@ const userController = () => {
     addTelegram,
     getAllUsersRank,
     getAllUserDetailed,
+    whiteListSpecificUser,
   };
 };
 

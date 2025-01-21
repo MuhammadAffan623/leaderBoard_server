@@ -19,6 +19,12 @@ userRouter.post(
   user.whiteListUser
 );
 
+userRouter.post(
+  "/whiteList/user",
+  authenticateAdmin,
+  user.whiteListSpecificUser
+);
+
 // admin update
 userRouter.post("/update/:id", authenticateAdmin, user.adminUpdateUser);
 userRouter.get("/all", user.getAllUsers);

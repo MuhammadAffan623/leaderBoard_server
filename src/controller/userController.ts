@@ -514,13 +514,14 @@ const userController = () => {
         return;
       }
       // Update user's isWishlist value to true if user exists
-      await User.findOneAndUpdate(
+      const user = await User.findOneAndUpdate(
         { walletAddress },
         { isWhiteListed: true },
         { new: true, upsert: true }
       );
       sendSuccessResponse({
         res,
+        data: user,
         message: "User white listed successfully",
       });
     } catch (error) {

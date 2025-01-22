@@ -22,3 +22,5 @@ const cronJob = async (): Promise<void> => {
 };
 const job = cron.schedule(cronSchedule, cronJob);
 job.start();
+
+export default job;

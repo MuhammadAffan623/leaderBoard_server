@@ -22,7 +22,11 @@ const userSchema = new Schema<IUser>(
   {
     twitterId: { type: String },
     walletAddress: { type: String },
-    telegramId: { type: String },
+    telegramId: {
+      type: String,
+      unique: true, // Ensures uniqueness
+      sparse: true, // Allows multiple documents with `null` values
+    },
     twitterUsername: { type: String },
     profileImage: { type: String },
 

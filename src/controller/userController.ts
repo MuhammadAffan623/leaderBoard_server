@@ -10,6 +10,7 @@ import passport from "passport";
 import { config } from "../config";
 import mongoose, { Types } from "mongoose";
 import dailyRewardService from "../service/dailyReward";
+import { createDailyLeaderboard } from "../cron/leaderboard";
 
 const userController = () => {
   const dailyReward = dailyRewardService();
@@ -32,6 +33,8 @@ const userController = () => {
         session
       );
       const existingUserId = await User.findOne({ twitterId }).session(session);
+      console.log("existingUser", existingUser);
+      console.log("existingUserId", existingUserId);
       if (existingUser?._id && existingUserId?._id) {
         if (
           (existingUser._id as Types.ObjectId).equals(
@@ -73,6 +76,13 @@ const userController = () => {
           }
           await User.findByIdAndDelete(existingUserId._id, { session });
           //complete here
+          await dailyReward.createInitialReward(
+            existingUser._id as string,
+            session
+          );
+          console.log("after initializing reward");
+          // creating leader board
+          createDailyLeaderboard();
           await session.commitTransaction();
           session.endSession();
           const token = await createToken(updatedUser);
@@ -653,6 +663,7 @@ const userController = () => {
     console.log("token==>", { token });
     return res.redirect(`${config.frontend_url}?twitterToken=${token}`);
   };
+
   return {
     getOrCreateUser,
     getUserbyToken,

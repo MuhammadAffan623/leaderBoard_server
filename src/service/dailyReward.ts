@@ -1,3 +1,4 @@
+import { ClientSession } from "mongoose";
 import { DailyReward } from "../models/dailyReward";
 
 const dailyRewardService = () => {
@@ -118,8 +119,25 @@ const dailyRewardService = () => {
       );
     }
   };
+  const createInitialReward = async (
+    userId: string,
+    session: ClientSession
+  ) => {
+    try {
+      if (!userId) {
+        throw new Error("User ID is required");
+      }
 
-  return { getUsersDailyRewards, getSpecificUserRewards };
+      const reward = await DailyReward.create({ userId }, { session });
+
+      return reward;
+    } catch (error) {
+      throw new Error(
+        `Failed to create reward for user ${userId}: ${error.message}`
+      );
+    }
+  };
+  return { getUsersDailyRewards, getSpecificUserRewards, createInitialReward };
 };
 
 export default dailyRewardService;

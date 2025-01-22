@@ -7,7 +7,7 @@ import logger from "../utils/logger";
 // const cronSchedule = "0 0 * * *"; // Once at midnight
 const cronSchedule = "0 * * * *"; // Run the job at the start of every hour
 // let done = false;
-const cronJob = async (): Promise<void> => {
+export const cronJob = async (): Promise<void> => {
   logger.info("Running cron job");
   // if (done) return;
   // done = true;

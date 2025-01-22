@@ -9,6 +9,7 @@ import router from "./routes";
 import "./config/passport";
 import passport from "passport";
 import session from "express-session";
+import { cronJob } from "./cron";
 import "./cron";
 const app = express();
 const server = http.createServer(app);
@@ -37,6 +38,7 @@ const corsOptions = {
   // Initialize Passport
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use("/api/cron", cronJob);
   app.use("/api/v1", router);
   // Initialize sockets
   server.listen(PORT, () => {

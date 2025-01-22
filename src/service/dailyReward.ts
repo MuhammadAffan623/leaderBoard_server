@@ -1,4 +1,4 @@
-import { ClientSession } from "mongoose";
+import { ClientSession, Types } from "mongoose";
 import { DailyReward } from "../models/dailyReward";
 
 const dailyRewardService = () => {
@@ -127,9 +127,9 @@ const dailyRewardService = () => {
       if (!userId) {
         throw new Error("User ID is required");
       }
-
-      const reward = await DailyReward.create({ userId }, { session });
-
+      const id = new Types.ObjectId(userId);
+      const newReward = new DailyReward({ userId: id });
+      const reward = await newReward.save({ session });
       return reward;
     } catch (error) {
       throw new Error(

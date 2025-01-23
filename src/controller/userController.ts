@@ -101,7 +101,7 @@ const userController = () => {
         const savedUser = await newUser.save({ session });
         const token = await createToken(savedUser);
         await session.commitTransaction();
-        session.endSession();
+        await session.endSession();
         sendSuccessResponse({
           res,
           data: { user: savedUser, token },
@@ -110,7 +110,7 @@ const userController = () => {
       }
     } catch (error) {
       await session.abortTransaction(); // Rollback on error
-      session.endSession();
+      await session.endSession();
       logger.error(
         `Error while getting user by wallet address ==> `,
         error.message

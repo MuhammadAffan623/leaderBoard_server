@@ -11,6 +11,7 @@ import passport from "passport";
 import session from "express-session";
 // import { cronJob } from "./cron";
 import "./cron";
+import "./telegram";
 const app = express();
 const server = http.createServer(app);
 const PORT = config.port;

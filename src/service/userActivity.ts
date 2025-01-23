@@ -2,8 +2,9 @@ import { UserActivity, IUserActivity } from "../models/userActivity";
 import { Types, ClientSession } from "mongoose";
 
 type UserActivityData = {
-  tweetIds: string[];
-  commentIds: string[];
+  tweetIds?: string[];
+  commentIds?: string[];
+  telegramSmsIds?: string[];
   // spaceAttendedIds: string[];
   // telegram chat ids too
 };

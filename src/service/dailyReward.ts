@@ -1,7 +1,13 @@
 import { ClientSession, Types } from "mongoose";
 import { DailyReward } from "../models/dailyReward";
+import rewardPriceService from "./rewardPrice";
+import { UserActivity } from "../models/userActivity";
+import { mergeArrays } from "../utils";
+import userActivityService from "./userActivity";
 
 const dailyRewardService = () => {
+  const rewardService = rewardPriceService();
+  const activityService = userActivityService();
   const getUsersDailyRewards = async () => {
     try {
       const groupedRewards = await DailyReward.aggregate([
@@ -137,7 +143,52 @@ const dailyRewardService = () => {
       );
     }
   };
-  return { getUsersDailyRewards, getSpecificUserRewards, createInitialReward };
+
+  const createSmsReward = async (
+    userId: string,
+    session: ClientSession,
+    messageId: string
+  ) => {
+    try {
+      if (!userId || !messageId) {
+        throw new Error("User ID and messageId is required");
+      }
+      const latestReward = await rewardService.getLatestPrice();
+      if (!latestReward) {
+        throw new Error("No reward price data found");
+      }
+      const id = new Types.ObjectId(userId);
+      const userActivity = await UserActivity.findOne({ userId: id });
+      const totalTelegramSmsId = await mergeArrays(
+        userActivity?.telegramSmsIds ?? [],
+        [messageId]
+      );
+      await activityService.createOrUpdateUserActivity(
+        userId,
+        {
+          telegramSmsIds: totalTelegramSmsId,
+        },
+        session
+      );
+      const newReward = new DailyReward({
+        userId: id,
+        telegramMessagesCount: 1,
+        calculatedReward: latestReward.telegramReward,
+      });
+      const reward = await newReward.save({ session });
+      return reward;
+    } catch (error) {
+      throw new Error(
+        `Failed to create reward for user ${userId}: ${error.message}`
+      );
+    }
+  };
+  return {
+    getUsersDailyRewards,
+    getSpecificUserRewards,
+    createInitialReward,
+    createSmsReward,
+  };
 };
 
 export default dailyRewardService;

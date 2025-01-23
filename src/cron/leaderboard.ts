@@ -43,6 +43,6 @@ export const createDailyLeaderboard = async () => {
     console.error(`Error creating leader board:`, error);
     throw error;
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };

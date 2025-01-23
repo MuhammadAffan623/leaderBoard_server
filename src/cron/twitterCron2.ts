@@ -170,7 +170,7 @@ const processUserData = async (user: IUser): Promise<void> => {
     console.error(`Error processing user ${user.id}:`, error);
     throw error;
   } finally {
-    session.endSession();
+    await session.endSession();
   }
 };
 

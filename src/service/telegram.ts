@@ -2,6 +2,7 @@ import logger from "../utils/logger";
 import { User } from "../models/user";
 import mongoose from "mongoose";
 import dailyRewardService from "./dailyReward";
+import { createDailyLeaderboard } from "../cron/leaderboard";
 
 const telegramService = () => {
   const dailyService = dailyRewardService();
@@ -28,6 +29,8 @@ const telegramService = () => {
         logger.info(`Reward created for user: ${user._id}, rewardId: ${d._id}`);
       }
       await session.commitTransaction();
+      // creating leader board
+      createDailyLeaderboard();
     } catch (error) {
       await session.abortTransaction();
       logger.error(

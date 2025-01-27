@@ -101,7 +101,6 @@ const processUserData = async (user: IUser): Promise<void> => {
       );
 
     const totalTweetCount = uniqueTweetIds.length;
-    const totalCommentCount = uniqueCommentIds.length;
 
     // Update user activity
     await activityService.createOrUpdateUserActivity(
@@ -123,10 +122,7 @@ const processUserData = async (user: IUser): Promise<void> => {
       (latestReward.impressionReward || 0) * impressionsCount +
       (latestReward.tweetsReward || 0) * totalTweetCount +
       (latestReward.retweetsReward || 0) * retweetCounts +
-      (latestReward.spacesAttendedReward || 0) * 0 + // Not implemented yet
-      (latestReward.telegramReward || 0) * 0 + // Not implemented yet
       (latestReward.commentReward || 0) * commentRecieved;
-
     const userTotalCronRewards: TotalCounts =
       await cronDailyService.getAllCronReward(user._id as string);
 

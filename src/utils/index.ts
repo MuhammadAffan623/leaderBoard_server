@@ -87,7 +87,7 @@ export const matchKeywordInString = async (
 
 export const isKeywordinPost = (text: string): boolean => {
   const keywords = ["@tardionmoon", "$TARDI", "tardi", "TARDI", "@Tardionmoon"];
-  return keywords.some((keyword) => text.includes(keyword));
+  return text.includes("tardi")
 };
 
 // merging 2 arrays without making duplicates

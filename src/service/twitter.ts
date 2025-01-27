@@ -33,6 +33,7 @@ const twitterService = () => {
         "tweet.fields":
           "in_reply_to_user_id,referenced_tweets,created_at,text,public_metrics",
         start_time: startTime,
+        max_results : 100
       });
       return tweetsResponse?.data?.data || [];
     } catch (error: any) {
@@ -54,15 +55,15 @@ const twitterService = () => {
       if (
         tweet?.referenced_tweets?.[0]?.type === "replied_to" &&
         tweet?.in_reply_to_user_id &&
-        isKeywordinPost(tweet.text)
+        isKeywordinPost(tweet.text?.toLowerCase())
       ) {
         newComments.push(tweet);
       } else if (
         tweet?.referenced_tweets?.[0]?.type === "retweeted" &&
-        isKeywordinPost(tweet.text)
+        isKeywordinPost(tweet.text?.toLowerCase())
       ) {
         newRetweet.push(tweet);
-      } else if (isKeywordinPost(tweet.text)) {
+      } else if (isKeywordinPost(tweet.text?.toLowerCase())) {
         newTweets.push(tweet);
       }
     }

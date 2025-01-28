@@ -477,7 +477,39 @@ const userController = () => {
       }
       const filePath = req.file.path;
       const csvRows = await parseCsv(filePath);
-
+      if (!csvRows?.length) {
+        sendSuccessResponse({
+          res,
+          data: {
+            success: false,
+          },
+          message: "csv doesnot have data to whitelist",
+        });
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            logger.error("Error deleting file:", err);
+          }
+        });
+        return;
+      }
+      const firstRow = csvRows?.[0];
+      console.log({ firstRow });
+      console.log("key ", "walletAddress" in firstRow);
+      if (firstRow && !("walletAddress" in firstRow)) {
+        sendSuccessResponse({
+          res,
+          data: {
+            success: false,
+          },
+          message: "walletAddress column not found in csv",
+        });
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            logger.error("Error deleting file:", err);
+          }
+        });
+        return;
+      }
       for (const row of csvRows) {
         const { walletAddress } = row;
         if (!walletAddress) continue;
@@ -497,6 +529,9 @@ const userController = () => {
       });
       sendSuccessResponse({
         res,
+        data: {
+          success: true,
+        },
         message: "Users white listed successfully",
       });
     } catch (error) {

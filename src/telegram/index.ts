@@ -58,9 +58,9 @@ const TARGET_GROUP: string = config.telegram_target_group; // Public group name
             sender?.username || sender?.firstName || "Unknown User";
           console.log(`@${username}: ${message.message}`);
           // check message contains tardi in it
-          if (isKeywordinPost(message.message)) {
+          // if (isKeywordinPost(message.message)) {
             telegramHelper.incrementUserMessage(message.id, username);
-          }
+          // }
         }
       }
     } catch (error: any) {

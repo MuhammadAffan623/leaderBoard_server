@@ -3,7 +3,12 @@ import { getTwitterClient } from "../config";
 import moment from "moment";
 import { isKeywordinPost } from "../utils";
 import { GetUserNewDataReturn } from "index";
-
+import * as fs from "fs";
+// import { response } from "@types/express";
+interface getUserNewTweetsResponse {
+  newData: TweetV2[] | [];
+  token: string;
+}
 const twitterService = () => {
   const twitterClient = getTwitterClient();
   // not add tweetId more than 100
@@ -23,19 +28,33 @@ const twitterService = () => {
   // returns user activity like RT, Tweet, Comment with their public metric that contain like count , impression count and retweet count
   const getUserNewTweets = async (
     userId: string,
-    date: string
-  ): Promise<TweetV2[]> => {
+    date: string,
+    paginationToken: string
+  ): Promise<getUserNewTweetsResponse> => {
     try {
       console.log("userId", userId);
       const startTime = moment(date).toISOString();
       console.log("startTime", startTime);
+      console.log(
+        "fetching from paginationToken?.length",
+        paginationToken?.length
+      );
       const tweetsResponse = await twitterClient.v2.userTimeline(userId, {
         "tweet.fields":
           "in_reply_to_user_id,referenced_tweets,created_at,text,public_metrics",
-        start_time: startTime,
-        max_results : 100
+        ...(paginationToken?.length
+          ? { pagination_token: paginationToken }
+          : { start_time: startTime }),
+        max_results: 100,
       });
-      return tweetsResponse?.data?.data || [];
+      fs.writeFileSync(
+        "./sample112.txt",
+        JSON.stringify({ tweetsResponse }, null, 2)
+      );
+      return {
+        newData: tweetsResponse?.data?.data || [],
+        token: tweetsResponse.data.meta.next_token || "",
+      };
     } catch (error: any) {
       console.log(error);
       console.error("Error fetching user tweets:", error.message);
@@ -45,9 +64,14 @@ const twitterService = () => {
 
   const getUserNewTweetsData = async (
     userId: string,
-    startTime: string
+    startTime: string,
+    paginationToken: string
   ): Promise<GetUserNewDataReturn> => {
-    const newData: TweetV2[] = await getUserNewTweets(userId, startTime);
+    const { newData, token }: getUserNewTweetsResponse = await getUserNewTweets(
+      userId,
+      startTime,
+      paginationToken
+    );
     let newTweets: TweetV2[] = [];
     let newRetweet: TweetV2[] = [];
     let newComments: TweetV2[] = [];
@@ -71,6 +95,7 @@ const twitterService = () => {
       newTweets,
       newRetweet,
       newComments,
+      token,
     };
   };
 

@@ -5,10 +5,12 @@ import { GetUserNewDataReturn, ICreateCron, TotalCounts } from "../types";
 import { getDifference, mergeArrays } from "../utils";
 import { TweetV2 } from "twitter-api-v2/dist/esm";
 import userActivityService from "../service/userActivity";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import cronDailyRewardService from "../service/cronDailyReward";
 import rewardPriceService from "../service/rewardPrice";
 import logger from "../utils/logger";
+import * as fs from "fs";
+import MetaDataController from "../controller/metaData";
 
 const tweetService = twitterService();
 const activityService = userActivityService();
@@ -59,12 +61,24 @@ const processUserData = async (user: IUser): Promise<void> => {
   try {
     logger.info(`Processing user: ${user._id}`);
     const userActivity = await UserActivity.findOne({ userId: user._id });
+    const latestMetaData = await MetaDataController().getLatestObj();
+    if (!latestMetaData) return;
+    const isFirstFetch =
+      user.fetchDateTime.getTime() === new Date("1995-01-01").getTime();
 
-    const { newTweets, newRetweet, newComments }: GetUserNewDataReturn =
+    console.log("isFirstFetch >> ", isFirstFetch);
+    const { newTweets, newRetweet, newComments, token }: GetUserNewDataReturn =
       await tweetService.getUserNewTweetsData(
         user.twitterId,
-        user.fetchDateTime.toISOString()
+        isFirstFetch
+          ? latestMetaData.fetchDate.toISOString()
+          : user.fetchDateTime.toISOString(),
+        user?.twitterToken || ""
       );
+    fs.writeFileSync(
+      "./sample2.txt",
+      JSON.stringify({ newTweets, newRetweet, newComments }, null, 2)
+    );
 
     // Process tweet IDs
     const newTweetsIds = newTweets.map((item) => item.id);
@@ -82,23 +96,23 @@ const processUserData = async (user: IUser): Promise<void> => {
     );
 
     const allTweetIds = [...uniqueCommentIds, ...uniqueTweetIds];
-
     const allTweetResponse = await processTweetIdsInBatches(allTweetIds);
+    // Assuming `allTweetResponse` is an array of tweet objects, stringify it for proper formatting
+    fs.writeFileSync("./sample.txt", JSON.stringify(allTweetResponse, null, 2));
 
     // Calculate metrics
-    const { impressionsCount, retweetCounts, commentRecieved } =
-      allTweetResponse.reduce(
-        (acc, item) => ({
-          impressionsCount:
-            acc.impressionsCount +
-            (item?.public_metrics?.impression_count ?? 0),
-          retweetCounts:
-            acc.retweetCounts + (item?.public_metrics?.retweet_count ?? 0),
-          commentRecieved:
-            acc.commentRecieved + (item?.public_metrics?.reply_count ?? 0),
-        }),
-        { impressionsCount: 0, retweetCounts: 0, commentRecieved: 0 }
-      );
+    const { impressionsCount, retweetCounts } = allTweetResponse.reduce(
+      (acc, item) => ({
+        impressionsCount:
+          acc.impressionsCount + (item?.public_metrics?.impression_count ?? 0),
+        // SUM of - all tweets having there own retweets // tardi tweet
+        retweetCounts:
+          acc.retweetCounts + (item?.public_metrics?.retweet_count ?? 0),
+        // commentRecieved:
+        //   acc.commentRecieved + (item?.public_metrics?.reply_count ?? 0),
+      }),
+      { impressionsCount: 0, retweetCounts: 0 }
+    );
 
     const totalTweetCount = uniqueTweetIds.length;
 
@@ -122,7 +136,7 @@ const processUserData = async (user: IUser): Promise<void> => {
       (latestReward.impressionReward || 0) * impressionsCount +
       (latestReward.tweetsReward || 0) * totalTweetCount +
       (latestReward.retweetsReward || 0) * retweetCounts +
-      (latestReward.commentReward || 0) * commentRecieved;
+      (latestReward.commentReward || 0) * uniqueCommentIds?.length;
     const userTotalCronRewards: TotalCounts =
       await cronDailyService.getAllCronReward(user._id as string);
 
@@ -144,7 +158,7 @@ const processUserData = async (user: IUser): Promise<void> => {
       telegramMessagesCount: 0,
       commentCounts: await getDifference(
         userTotalCronRewards.totalCommentCounts,
-        commentRecieved
+        uniqueCommentIds?.length
       ),
       calculatedReward: await getDifference(
         totalPrice,
@@ -155,7 +169,7 @@ const processUserData = async (user: IUser): Promise<void> => {
     await cronDailyService.createCronDailyReward(userDailyReward, session);
     await User.findByIdAndUpdate(
       user._id,
-      { $set: { fetchDateTime: new Date() } },
+      { $set: { fetchDateTime: new Date(), twitterToken: token } },
       { new: true }
     );
     await session.commitTransaction();

@@ -21,6 +21,7 @@ export type GetUserNewDataReturn = {
   newTweets: TweetV2[];
   newRetweet: TweetV2[];
   newComments: TweetV2[];
+  token: string;
 };
 
 export type UserActivityData = {

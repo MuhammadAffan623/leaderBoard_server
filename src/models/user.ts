@@ -16,6 +16,7 @@ export interface IUser extends Document {
   role: USERROLE;
   isWhiteListed: boolean;
   profileImage: string;
+  twitterToken: string;
 }
 
 const userSchema = new Schema<IUser>(
@@ -34,7 +35,7 @@ const userSchema = new Schema<IUser>(
     fetchDateTime: {
       type: Date,
       required: true,
-      default: new Date("2025-01-01"), //update it according to project start time
+      default: new Date("1995-01-01"), //update it according to project start time
     },
     isWhiteListed: { type: Boolean, default: false },
     role: {
@@ -42,6 +43,7 @@ const userSchema = new Schema<IUser>(
       default: USERROLE.USER,
       enum: Object.values(USERROLE),
     },
+    twitterToken: { type: String, default: null },
   },
   { timestamps: true }
 );

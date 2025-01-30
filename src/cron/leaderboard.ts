@@ -4,15 +4,15 @@ import dailyRewardService from "../service/dailyReward";
 import leaderBoardService from "../service/leaderboard";
 import mongoose from "mongoose";
 
-const rewardService = dailyRewardService();
-const leaderBoardMethods = leaderBoardService();
 export const createDailyLeaderboard = async () => {
+  const rewardService = dailyRewardService();
+  const leaderBoardMethods = leaderBoardService();
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
     const date = new Date();
     const usersDailyRewardSum = await rewardService.getUsersDailyRewards();
-    let leaderBoardObject: CreateLeaderboardObject[] = usersDailyRewardSum.map(
+    let leaderBoardObject: CreateLeaderboardObject[] = usersDailyRewardSum?.map(
       (item, ind) => {
         return {
           userId: item.userId,

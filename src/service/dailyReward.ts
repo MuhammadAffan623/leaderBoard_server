@@ -1,16 +1,23 @@
-import { ClientSession, Types } from "mongoose";
+import mongoose, { ClientSession, Types } from "mongoose";
 import { DailyReward } from "../models/dailyReward";
 import rewardPriceService from "./rewardPrice";
 import { UserActivity } from "../models/userActivity";
 import { mergeArrays } from "../utils";
 import userActivityService from "./userActivity";
+import MetaDataController from "../controller/metaData";
+import { IUser, User } from "../models/user";
 
 const dailyRewardService = () => {
   const rewardService = rewardPriceService();
   const activityService = userActivityService();
   const getUsersDailyRewards = async () => {
+    const latestMetaData = await MetaDataController().getLatestObj();
+    if (!latestMetaData) return [];
+    const leaderDate = latestMetaData.leaderBoardCreation;
     try {
       const groupedRewards = await DailyReward.aggregate([
+        // match me created at awala seen add krna
+        { $match: { createdAt: { $gte: leaderDate } } },
         {
           $group: {
             _id: "$userId", // Group by userId
@@ -144,6 +151,45 @@ const dailyRewardService = () => {
     }
   };
 
+  const createInitialRewardForAllUsers = async (
+    time: string
+  ): Promise<boolean> => {
+    const session = await mongoose.startSession();
+    console.log("time >> ",time)
+    console.log("time >> ",new Date(time))
+    try {
+      await session.withTransaction(async () => {
+        // await is missing in original code
+        const users = await User.find({
+          twitterId: { $exists: true, $ne: null },
+        }).lean();
+
+        // Process users in batches to avoid memory issues
+        const batchSize = 100;
+        for (let i = 0; i < users.length; i += batchSize) {
+          const batch = users.slice(i, i + batchSize);
+          const rewardPromises = batch.map((user: IUser) => {
+            const id = new Types.ObjectId(user._id as string);
+            const newReward = new DailyReward({
+              userId: id,
+              createdAt: new Date(time),
+            });
+            return newReward.save({ session });
+          });
+
+          await Promise.all(rewardPromises);
+        }
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Error creating initial rewards:", error);
+      return false;
+    } finally {
+      await session.endSession();
+    }
+  };
+
   const createSmsReward = async (
     userId: string,
     session: ClientSession,
@@ -188,6 +234,7 @@ const dailyRewardService = () => {
     getSpecificUserRewards,
     createInitialReward,
     createSmsReward,
+    createInitialRewardForAllUsers,
   };
 };
 

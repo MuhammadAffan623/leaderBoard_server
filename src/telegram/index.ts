@@ -33,7 +33,7 @@ const TARGET_GROUP: string = config.telegram_target_group; // Public group name
       onError: (err: Error) => console.log("Error during authentication:", err),
     });
 
-    fs.writeFileSync(teleframPath, client.session.save() as any, "utf8");
+    // fs.writeFileSync(teleframPath, client.session.save() as any, "utf8");
   } else {
     await client.connect();
   }

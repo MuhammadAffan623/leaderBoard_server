@@ -75,10 +75,10 @@ const processUserData = async (user: IUser): Promise<void> => {
           : user.fetchDateTime.toISOString(),
         user?.twitterToken || ""
       );
-    fs.writeFileSync(
-      "./sample2.txt",
-      JSON.stringify({ newTweets, newRetweet, newComments }, null, 2)
-    );
+    // fs.writeFileSync(
+    //   "./sample2.txt",
+    //   JSON.stringify({ newTweets, newRetweet, newComments }, null, 2)
+    // );
 
     // Process tweet IDs
     const newTweetsIds = newTweets.map((item) => item.id);
@@ -98,7 +98,7 @@ const processUserData = async (user: IUser): Promise<void> => {
     const allTweetIds = [...uniqueCommentIds, ...uniqueTweetIds];
     const allTweetResponse = await processTweetIdsInBatches(allTweetIds);
     // Assuming `allTweetResponse` is an array of tweet objects, stringify it for proper formatting
-    fs.writeFileSync("./sample.txt", JSON.stringify(allTweetResponse, null, 2));
+    // fs.writeFileSync("./sample.txt", JSON.stringify(allTweetResponse, null, 2));
 
     // Calculate metrics
     const { impressionsCount, retweetCounts } = allTweetResponse.reduce(

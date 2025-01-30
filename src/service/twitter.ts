@@ -47,10 +47,10 @@ const twitterService = () => {
           : { start_time: startTime }),
         max_results: 100,
       });
-      fs.writeFileSync(
-        "./sample112.txt",
-        JSON.stringify({ tweetsResponse }, null, 2)
-      );
+      // fs.writeFileSync(
+      //   "./sample112.txt",
+      //   JSON.stringify({ tweetsResponse }, null, 2)
+      // );
       return {
         newData: tweetsResponse?.data?.data || [],
         token: tweetsResponse.data.meta.next_token || "",

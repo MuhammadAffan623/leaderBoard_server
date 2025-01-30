@@ -2,8 +2,12 @@ import { sendErrorResponse, sendSuccessResponse } from "../utils/response";
 import { Response } from "express";
 import logger from "../utils/logger";
 import { CustomRequest } from "../types";
-import { MetaData } from "../models/metaData";
+import { IMetadata, MetaData } from "../models/metaData";
+import dailyRewardService from "../service/dailyReward";
+import { createDailyLeaderboard } from "../cron/leaderboard";
+
 const MetaDataController = () => {
+  const dailyReward = dailyRewardService();
   const createFirst = async (req: CustomRequest, res: Response) => {
     try {
       const { fetchDate, leaderBoardCreation } = req.body;
@@ -23,6 +27,10 @@ const MetaDataController = () => {
       });
       if (metdata) {
         logger.info("Meta data created successfully", metdata);
+        await dailyReward.createInitialRewardForAllUsers(leaderBoardCreation);
+
+        createDailyLeaderboard();
+
         return sendSuccessResponse({
           res,
           data: { success: true, data: metdata },
@@ -74,6 +82,9 @@ const MetaDataController = () => {
       );
       if (updatedData) {
         logger.info("meta data updated successfully", updatedData);
+        await dailyReward.createInitialRewardForAllUsers(leaderBoardCreation);
+
+        createDailyLeaderboard();
         return sendSuccessResponse({
           res,
           data: { success: true, data: updatedData },
@@ -117,10 +128,22 @@ const MetaDataController = () => {
       });
     }
   };
+
+  const getLatestObj = async (): Promise<IMetadata | null> => {
+    try {
+      const latestMeta = await MetaData.find().sort("-createdAt").lean();
+      return latestMeta?.length ? latestMeta?.[0] : null;
+    } catch (error) {
+      logger.error("Error in fetching meta data:", error);
+      return null;
+    }
+  };
+
   return {
     createFirst,
     updateExisting,
     getLatest,
+    getLatestObj,
   };
 };
 

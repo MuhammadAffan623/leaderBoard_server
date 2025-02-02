@@ -84,7 +84,7 @@ const processUserData = async (user: IUser): Promise<void> => {
     const newTweetsIds = newTweets.map((item) => item.id);
     const newRetweetIds = newRetweet.map((item) => item.id);
     const uniqueTweetIds = await mergeArrays(
-      [...newTweetsIds, ...newRetweetIds],
+      [...newTweetsIds, ...newRetweetIds], //ig remove retweet
       userActivity?.tweetIds ?? []
     );
 
@@ -132,38 +132,46 @@ const processUserData = async (user: IUser): Promise<void> => {
       throw new Error("No reward price data found");
     }
 
-    const totalPrice =
-      (latestReward.impressionReward || 0) * impressionsCount +
-      (latestReward.tweetsReward || 0) * totalTweetCount +
-      (latestReward.retweetsReward || 0) * retweetCounts +
-      (latestReward.commentReward || 0) * uniqueCommentIds?.length;
+    // const totalPrice =
+    // (latestReward.impressionReward || 0) * impressionsCount +
+    // (latestReward.tweetsReward || 0) * totalTweetCount +
+    // (latestReward.retweetsReward || 0) * retweetCounts +
+    // (latestReward.commentReward || 0) * uniqueCommentIds?.length;
     const userTotalCronRewards: TotalCounts =
       await cronDailyService.getAllCronReward(user._id as string);
-
+    const newimpressionsCount: number = await getDifference(
+      userTotalCronRewards.totalImpressionCount,
+      impressionsCount
+    );
+    console.log("total latest : ", userTotalCronRewards.totalImpressionCount);
+    console.log("impressionCount", impressionsCount);
+    console.log("newimpressionsCount >> ", newimpressionsCount);
+    const newtweetCounts: number = await getDifference(
+      userTotalCronRewards.totalTweetCount,
+      totalTweetCount
+    );
+    const newretweetCounts: number = await getDifference(
+      userTotalCronRewards.totalRetweetCount,
+      retweetCounts
+    );
+    const newcommentCounts: number = await getDifference(
+      userTotalCronRewards.totalCommentCounts,
+      uniqueCommentIds?.length
+    );
+    const newcalculatedReward =
+      (latestReward.impressionReward || 0) * newimpressionsCount +
+      (latestReward.tweetsReward || 0) * newtweetCounts +
+      (latestReward.retweetsReward || 0) * newretweetCounts +
+      (latestReward.commentReward || 0) * newcommentCounts;
     const userDailyReward: ICreateCron = {
       userId: user._id as string,
-      impressionsCount: await getDifference(
-        userTotalCronRewards.totalImpressionCount,
-        impressionsCount
-      ),
-      tweetCounts: await getDifference(
-        userTotalCronRewards.totalTweetCount,
-        totalTweetCount
-      ),
-      retweetCounts: await getDifference(
-        userTotalCronRewards.totalRetweetCount,
-        retweetCounts
-      ),
+      impressionsCount: newimpressionsCount,
+      tweetCounts: newtweetCounts,
+      retweetCounts: newretweetCounts,
       spacesAttendedCount: 0,
       telegramMessagesCount: 0,
-      commentCounts: await getDifference(
-        userTotalCronRewards.totalCommentCounts,
-        uniqueCommentIds?.length
-      ),
-      calculatedReward: await getDifference(
-        totalPrice,
-        userTotalCronRewards.totalCalculatedReward
-      ),
+      commentCounts: newcommentCounts,
+      calculatedReward: newcalculatedReward,
     };
 
     await cronDailyService.createCronDailyReward(userDailyReward, session);

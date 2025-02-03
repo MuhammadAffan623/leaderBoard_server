@@ -3,6 +3,7 @@ import { Schema, model, Document, Types } from "mongoose";
 export interface IUserActivity extends Document {
   userId: Types.ObjectId;
   tweetIds: string[];
+  retweetIds: string[];
   commentIds: string[];
   spaceAttendedIds: string[];
   telegramSmsIds: string[];
@@ -13,7 +14,8 @@ export interface IUserActivity extends Document {
 const userActivitySchema = new Schema<IUserActivity>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    tweetIds: [{ type: String }], // also contains retweetIds
+    tweetIds: [{ type: String }],
+    retweetIds: [{ type: String }],
     spaceAttendedIds: [{ type: String }],
     commentIds: [{ type: String }],
     telegramSmsIds: [{ type: String }],

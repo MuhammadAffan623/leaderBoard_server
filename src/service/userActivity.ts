@@ -3,6 +3,7 @@ import { Types, ClientSession } from "mongoose";
 
 type UserActivityData = {
   tweetIds?: string[];
+  retweetIds?: string[];
   commentIds?: string[];
   telegramSmsIds?: string[];
   // spaceAttendedIds: string[];

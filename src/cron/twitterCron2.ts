@@ -84,7 +84,7 @@ const processUserData = async (user: IUser): Promise<void> => {
     const newTweetsIds = newTweets.map((item) => item.id);
     const newRetweetIds = newRetweet.map((item) => item.id);
     const uniqueTweetIds = await mergeArrays(
-      [...newTweetsIds, ...newRetweetIds], //ig remove retweet
+      [...newTweetsIds], //ig remove retweet
       userActivity?.tweetIds ?? []
     );
 
@@ -95,23 +95,28 @@ const processUserData = async (user: IUser): Promise<void> => {
       userActivity?.commentIds ?? []
     );
 
+    const uniqueRetweetIds = await mergeArrays(
+      newRetweetIds,
+      userActivity?.retweetIds ?? []
+    );
+
     const allTweetIds = [...uniqueCommentIds, ...uniqueTweetIds];
     const allTweetResponse = await processTweetIdsInBatches(allTweetIds);
     // Assuming `allTweetResponse` is an array of tweet objects, stringify it for proper formatting
     // fs.writeFileSync("./sample.txt", JSON.stringify(allTweetResponse, null, 2));
 
     // Calculate metrics
-    const { impressionsCount, retweetCounts } = allTweetResponse.reduce(
+    const { impressionsCount } = allTweetResponse.reduce(
       (acc, item) => ({
         impressionsCount:
           acc.impressionsCount + (item?.public_metrics?.impression_count ?? 0),
         // SUM of - all tweets having there own retweets // tardi tweet
-        retweetCounts:
-          acc.retweetCounts + (item?.public_metrics?.retweet_count ?? 0),
+        // retweetCounts:
+        //   acc.retweetCounts + (item?.public_metrics?.retweet_count ?? 0),
         // commentRecieved:
         //   acc.commentRecieved + (item?.public_metrics?.reply_count ?? 0),
       }),
-      { impressionsCount: 0, retweetCounts: 0 }
+      { impressionsCount: 0 }
     );
 
     const totalTweetCount = uniqueTweetIds.length;
@@ -122,6 +127,7 @@ const processUserData = async (user: IUser): Promise<void> => {
       {
         tweetIds: uniqueTweetIds,
         commentIds: uniqueCommentIds,
+        retweetIds: uniqueRetweetIds,
       },
       session
     );
@@ -152,7 +158,7 @@ const processUserData = async (user: IUser): Promise<void> => {
     );
     const newretweetCounts: number = await getDifference(
       userTotalCronRewards.totalRetweetCount,
-      retweetCounts
+      uniqueRetweetIds?.length
     );
     const newcommentCounts: number = await getDifference(
       userTotalCronRewards.totalCommentCounts,

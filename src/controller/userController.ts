@@ -510,7 +510,26 @@ const userController = () => {
         });
         return;
       }
+      // Count existing whitelisted users
+      const whiteListedCount = await User.countDocuments({
+        isWhiteListed: true,
+      });
+      console.log({ whiteListedCount });
+      if (whiteListedCount >= 500) {
+        sendSuccessResponse({
+          res,
+          data: { success: false },
+          message: "Whitelist limit of 500 users reached",
+        });
+        fs.unlink(filePath, (err) => {
+          if (err) logger.error("Error deleting file:", err);
+        });
+        return;
+      }
+      let addedCount = 0;
       for (const row of csvRows) {
+        if (addedCount + whiteListedCount >= 500) break; // Stop if limit reached
+
         const { walletAddress } = row;
         if (!walletAddress) continue;
 
@@ -520,6 +539,7 @@ const userController = () => {
           { isWhiteListed: true },
           { new: true, upsert: true }
         );
+        addedCount++;
       }
       // Delete the file after processing
       fs.unlink(filePath, (err) => {
@@ -558,6 +578,17 @@ const userController = () => {
         });
         return;
       }
+      const whiteListedCount = await User.countDocuments({
+        isWhiteListed: true,
+      });
+      console.log({ whiteListedCount });
+      if (whiteListedCount >= 500) {
+        sendSuccessResponse({
+          res,
+          data: { success: false },
+          message: "Whitelist limit of 500 users reached",
+        });
+      }
       // Update user's isWishlist value to true if user exists
       const user = await User.findOneAndUpdate(
         { walletAddress },
@@ -566,7 +597,7 @@ const userController = () => {
       );
       sendSuccessResponse({
         res,
-        data: user,
+        data: { user, success: true },
         message: "User white listed successfully",
       });
     } catch (error) {

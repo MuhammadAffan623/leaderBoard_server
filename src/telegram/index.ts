@@ -64,7 +64,7 @@ const TARGET_GROUP: string = config.telegram_target_group; // Public group name
         }
       }
     } catch (error: any) {
-      //   console.error("Error processing update:", error.message);
+        console.error("Error processing update:", error.message);
     }
   });
 })();

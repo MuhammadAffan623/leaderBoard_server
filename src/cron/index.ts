@@ -6,7 +6,8 @@ import MetaDataController from "../controller/metaData";
 
 // const cronSchedule = "*/1 * * * * *"; // Runs every second
 // const cronSchedule = "0 0 * * *"; // Once at midnight
-const cronSchedule = "0 * * * *"; // Run the job at the start of every hour
+// const cronSchedule = "0 * * * *"; // Run the job at the start of every hour
+const cronSchedule = "0 */2 * * *"; // Run the job every 2 hours
 // let done = false;
 export const cronJob = async (): Promise<void> => {
   logger.info("Running cron job");

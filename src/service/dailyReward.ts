@@ -192,7 +192,6 @@ const dailyRewardService = () => {
 
   const createSmsReward = async (
     userId: string,
-    session: ClientSession,
     messageId: string
   ) => {
     try {
@@ -209,19 +208,18 @@ const dailyRewardService = () => {
         userActivity?.telegramSmsIds ?? [],
         [messageId]
       );
-      await activityService.createOrUpdateUserActivity(
-        userId,
-        {
-          telegramSmsIds: totalTelegramSmsId,
-        },
-        session
-      );
+      // await activityService.createOrUpdateUserActivity(
+      //   userId,
+      //   {
+      //     telegramSmsIds: totalTelegramSmsId,
+      //   }
+      // );
       const newReward = new DailyReward({
         userId: id,
         telegramMessagesCount: 1,
         calculatedReward: latestReward.telegramReward,
       });
-      const reward = await newReward.save({ session });
+      const reward = await newReward.save();
       return reward;
     } catch (error) {
       throw new Error(

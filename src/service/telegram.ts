@@ -22,22 +22,21 @@ const telegramService = () => {
 
         const d = await dailyService.createSmsReward(
           user._id as string,
-          session,
           messageId
         );
 
         logger.info(`Reward created for user: ${user._id}, rewardId: ${d._id}`);
       }
-      await session.commitTransaction();
+      // await session.commitTransaction();
       // creating leader board
       createDailyLeaderboard();
     } catch (error) {
-      await session.abortTransaction();
+      // await session.abortTransaction();
       logger.error(
         `failed to increment user message: ${error.message} of user: ${telegramId}`
       );
     } finally {
-      await session.endSession();
+      // await session.endSession();
     }
   };
 

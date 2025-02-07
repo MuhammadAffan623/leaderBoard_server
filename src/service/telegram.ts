@@ -29,7 +29,7 @@ const telegramService = () => {
       }
       // await session.commitTransaction();
       // creating leader board
-      createDailyLeaderboard();
+      // createDailyLeaderboard();
     } catch (error) {
       // await session.abortTransaction();
       logger.error(

@@ -20,6 +20,12 @@ userRouter.post(
 );
 
 userRouter.post(
+  "/deleteUser",
+  authenticateAdmin,
+  user.deleteUser
+);
+
+userRouter.post(
   "/whiteList/user",
   authenticateAdmin,
   user.whiteListSpecificUser

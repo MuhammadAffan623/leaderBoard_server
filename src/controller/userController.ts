@@ -11,6 +11,7 @@ import { config } from "../config";
 import mongoose, { Types } from "mongoose";
 import dailyRewardService from "../service/dailyReward";
 import { createDailyLeaderboard } from "../cron/leaderboard";
+import { DailyReward } from "../models/dailyReward";
 
 const userController = () => {
   const dailyReward = dailyRewardService();
@@ -730,6 +731,45 @@ const userController = () => {
     return res.redirect(`${config.frontend_url}?twitterToken=${token}`);
   };
 
+  const deleteUser = async (req: CustomRequest, res: Response) => {
+    logger.info("userController admin delete user");
+    try {
+      const { userId } = req.body;
+      if (!userId) {
+        logger.error(`Error deleting user ==> `);
+        sendErrorResponse({
+          req,
+          res,
+          error: "UserId is required",
+          statusCode: 400,
+        });
+        return;
+      }
+
+      await User.deleteOne({
+        _id: userId,
+      });
+      await DailyReward.deleteMany({
+        userId,
+      });
+      sendSuccessResponse({
+        res,
+        data: { success: true },
+        message: "User has been deleted successfully",
+      });
+      createDailyLeaderboard()
+    } catch (err) {
+      logger.error(err);
+      sendErrorResponse({
+        req,
+        res,
+        error: "Error occured while delteing the User",
+        statusCode: 400,
+      });
+      return;
+    }
+  };
+
   return {
     getOrCreateUser,
     getUserbyToken,
@@ -745,6 +785,7 @@ const userController = () => {
     getAllUsersRank,
     getAllUserDetailed,
     whiteListSpecificUser,
+    deleteUser,
   };
 };
 

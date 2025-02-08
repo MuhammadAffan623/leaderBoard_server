@@ -36,7 +36,7 @@ const processTweetIdsInBatches = async (
 
       if (i + BATCH_SIZE < allTweetIds.length) {
         console.log("Pausing for 1 minute...");
-        await new Promise((resolve) => setTimeout(resolve, PAUSE_DURATION_MS));
+        // await new Promise((resolve) => setTimeout(resolve, PAUSE_DURATION_MS));
       }
     } catch (error) {
       logger.error(

@@ -27,6 +27,7 @@ const userSchema = new Schema<IUser>(
       type: String,
       unique: true, // Ensures uniqueness
       sparse: true, // Allows multiple documents with `null` values
+      lowercase: true,
     },
     twitterUsername: { type: String },
     profileImage: { type: String },

@@ -7,6 +7,7 @@ import { config } from "../config";
 import path from "path";
 import { isKeywordinPost } from "../utils";
 import telegramService from "../service/telegram";
+import telegramSMSService from "../service/telegramSms";
 // Telegram credentials
 const apiId: number = config.telegram_api_id;
 const apiHash: string = config.telegram_api_hash;
@@ -20,6 +21,7 @@ const TARGET_GROUP: string = config.telegram_target_group; // Public group name
 
 (async () => {
   const telegramHelper = telegramService();
+  const tService = telegramSMSService();
   const client = new TelegramClient(stringSession, apiId, apiHash, {
     connectionRetries: 5,
   });
@@ -54,17 +56,25 @@ const TARGET_GROUP: string = config.telegram_target_group; // Public group name
         if (message && message.fromId?.userId) {
           const userId = message.fromId.userId;
           const sender: any = await client.getEntity(userId);
-          const username =
-            sender?.username || sender?.firstName || "Unknown User";
+          const username = (
+            sender?.username ||
+            sender?.firstName ||
+            "Unknown User"
+          )
+            ?.toString()
+            ?.toLowerCase();
           console.log(`@${username}: ${message.message}`);
           // check message contains tardi in it
           // if (isKeywordinPost(message.message)) {
-            telegramHelper.incrementUserMessage(message.id, username);
+
+          telegramHelper.incrementUserMessage(message.id, username);
+          // just to store fetched telegram message into separate table for verfication
+          tService.createSms(username, message.message);
           // }
         }
       }
     } catch (error: any) {
-        console.error("Error processing update:", error.message);
+      console.error("Error processing update:", error.message);
     }
   });
 })();

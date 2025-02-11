@@ -26,7 +26,9 @@ const Mongo = () => {
           logger.error("Database disconnected");
         });
       await mongoose.connect(config.mongo_uri);
-    } catch (error) {}
+    } catch (error) {
+      logger.error("Error in mongoose connect =>", error);
+    }
   };
 
   const disconnect = async () => {

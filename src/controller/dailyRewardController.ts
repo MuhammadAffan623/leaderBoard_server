@@ -183,11 +183,9 @@ const DailyRewardController = () => {
         data: {
           success: true,
           message: "successfully fetched user activity",
-          ids: [
-            ...(userActivity?.tweetIds || []),
-            ...(userActivity?.retweetIds || []),
-            ...(userActivity?.commentIds || []),
-          ],
+          tweetIds: userActivity?.tweetIds || [],
+          retweetIds: userActivity?.retweetIds || [],
+          commentIds: userActivity?.commentIds || [],
         },
       });
     } catch (error) {

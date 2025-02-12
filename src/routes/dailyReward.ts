@@ -13,4 +13,6 @@ dailyRewardRouter.post(
   dailyreward.removeActivityId
 );
 
+dailyRewardRouter.get('/user/:userId',dailyreward.userActivity)
+
 export default dailyRewardRouter;

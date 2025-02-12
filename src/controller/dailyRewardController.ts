@@ -4,6 +4,8 @@ import logger from "../utils/logger";
 import { DailyReward } from "../models/dailyReward";
 import rewardPriceService from "../service/rewardPrice";
 import { IUserActivity, UserActivity } from "../models/userActivity";
+import { Types } from "mongoose";
+// import { UserActivity } from "../models/userActivity";
 
 const DailyRewardController = () => {
   const rewardService = rewardPriceService();
@@ -168,7 +170,38 @@ const DailyRewardController = () => {
     }
   };
 
-  return { adjustUserReward, removeActivityId };
+  const userActivity = async (req: Request, res: Response): Promise<void> => {
+    try {
+      logger.info("get user UserActivity");
+      const { userId } = req.params;
+
+      const userActivity = await UserActivity.findOne({
+        userId: new Types.ObjectId(userId),
+      });
+      sendSuccessResponse({
+        res,
+        data: {
+          success: true,
+          message: "successfully fetched user activity",
+          ids: [
+            ...(userActivity?.tweetIds || []),
+            ...(userActivity?.retweetIds || []),
+            ...(userActivity?.commentIds || []),
+          ],
+        },
+      });
+    } catch (error) {
+      logger.error("Error fetching user activity:", error);
+      sendErrorResponse({
+        req,
+        res,
+        error: "Failed to fetch user activity",
+        statusCode: 500,
+      });
+    }
+  };
+
+  return { adjustUserReward, removeActivityId, userActivity };
 };
 
 export default DailyRewardController;

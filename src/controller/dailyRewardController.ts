@@ -186,6 +186,7 @@ const DailyRewardController = () => {
           tweetIds: userActivity?.tweetIds || [],
           retweetIds: userActivity?.retweetIds || [],
           commentIds: userActivity?.commentIds || [],
+          userActivity
         },
       });
     } catch (error) {

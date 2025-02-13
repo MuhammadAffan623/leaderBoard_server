@@ -145,10 +145,14 @@ const processUserData = async (user: IUser): Promise<void> => {
     // (latestReward.commentReward || 0) * uniqueCommentIds?.length;
     const userTotalCronRewards: TotalCounts =
       await cronDailyService.getAllCronReward(user._id as string);
-    const newimpressionsCount: number = await getDifference(
-      userTotalCronRewards.totalImpressionCount,
-      impressionsCount
+    const newimpressionsCount = Math.max(
+      0,
+      impressionsCount - userTotalCronRewards.totalImpressionCount
     );
+    // const newimpressionsCount: number = await getDifference(
+    //   userTotalCronRewards.totalImpressionCount,
+    //   impressionsCount
+    // );
     console.log("total latest : ", userTotalCronRewards.totalImpressionCount);
     console.log("impressionCount", impressionsCount);
     console.log("newimpressionsCount >> ", newimpressionsCount);

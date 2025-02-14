@@ -17,14 +17,7 @@ const DailyRewardController = () => {
     logger.info("Adjusting user reward");
 
     try {
-      const {
-        userId,
-        impressionsCount = 0,
-        tweetCounts = 0,
-        telegramMessagesCount = 0,
-        retweetCounts = 0,
-        commentCounts = 0,
-      } = req.body;
+      const { userId, calculatedReward } = req.body;
 
       // Validate required fields
       if (!userId) {
@@ -37,34 +30,10 @@ const DailyRewardController = () => {
         return;
       }
 
-      const latestReward = await rewardService.getLatestPrice();
-      if (!latestReward) {
-        sendErrorResponse({
-          req,
-          res,
-          error: "You need to add reward price first",
-          statusCode: 500,
-        });
-        return;
-      }
-
-      // Calculate reward safely
-      const totalPrice =
-        (latestReward.impressionReward || 0) * impressionsCount +
-        (latestReward.tweetsReward || 0) * tweetCounts +
-        (latestReward.retweetsReward || 0) * retweetCounts +
-        (latestReward.commentReward || 0) * commentCounts +
-        (latestReward.telegramReward || 0) * telegramMessagesCount;
-
       // Save the reward entry
       const newReward = await DailyReward.create({
         userId,
-        impressionsCount,
-        tweetCounts,
-        telegramMessagesCount,
-        retweetCounts,
-        commentCounts,
-        calculatedReward: totalPrice,
+        calculatedReward,
       });
 
       sendSuccessResponse({
@@ -74,7 +43,7 @@ const DailyRewardController = () => {
           reward: newReward,
         },
       });
-    } catch (error) {
+     } catch (error) {
       logger.error(error);
       sendErrorResponse({
         req,
@@ -186,7 +155,7 @@ const DailyRewardController = () => {
           tweetIds: userActivity?.tweetIds || [],
           retweetIds: userActivity?.retweetIds || [],
           commentIds: userActivity?.commentIds || [],
-          userActivity
+          userActivity,
         },
       });
     } catch (error) {

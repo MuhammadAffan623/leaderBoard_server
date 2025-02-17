@@ -67,9 +67,9 @@ const TARGET_GROUP: string = config.telegram_target_group; // Public group name
           // check message contains tardi in it
           // if (isKeywordinPost(message.message)) {
 
-          telegramHelper.incrementUserMessage(message.id, username);
           // just to store fetched telegram message into separate table for verfication
           tService.createSms(username, message.message);
+          telegramHelper.incrementUserMessage(message.id, username);
           // }
         }
       }

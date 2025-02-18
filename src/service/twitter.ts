@@ -18,7 +18,7 @@ const twitterService = () => {
         "tweet.fields": ["public_metrics"],
       });
 
-      return tweet.data;
+      return tweet?.data || [];
     } catch (error: any) {
       console.log(error);
       console.error("Error fetching tweet details:", error.message);

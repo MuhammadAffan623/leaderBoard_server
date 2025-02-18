@@ -53,7 +53,7 @@ const twitterService = () => {
       // );
       return {
         newData: tweetsResponse?.data?.data || [],
-        token: tweetsResponse.data.meta.next_token || "",
+        token: tweetsResponse?.data?.meta?.next_token || "",
       };
     } catch (error: any) {
       console.log(error);

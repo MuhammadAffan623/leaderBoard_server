@@ -30,9 +30,9 @@ export const cronJob = async (): Promise<void> => {
 
   logger.info("Cron job done");
 };
-(()=>{
-  cronJob()
-})()
+// (()=>{
+//   cronJob()
+// })()
 const job = cron.schedule(cronSchedule, cronJob);
 job.start();
 

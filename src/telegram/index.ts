@@ -68,7 +68,7 @@ const TARGET_GROUP: string = config.telegram_target_group; // Public group name
           // if (isKeywordinPost(message.message)) {
 
           // just to store fetched telegram message into separate table for verfication
-          tService.createSms(username, message.message);
+          tService.createSms(username, message.message || "");
           telegramHelper.incrementUserMessage(message.id, username);
           // }
         }
